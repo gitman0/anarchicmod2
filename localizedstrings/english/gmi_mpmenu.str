@@ -10,14 +10,14 @@
 //  as being untranslated.)
 //
 VERSION             "1"
-CONFIG              "C:\COD\bin\StringEd\StringEd.cfg"
+CONFIG              "C:\cod\source_data\string_resources\StringEd.cfg"
 FILENOTES           ""
 
 REFERENCE           5_30CAL
 LANG_ENGLISH        "5. M1919A6 .30 cal"
 
 REFERENCE           THE_MG34_MACHINE_GUN
-LANG_ENGLISH        "The MG34 light machine gun is ideal for the squad support role. Due to its large size, it must be deployed before firing."
+LANG_ENGLISH        "The MG34 light machine gun is ideal for the squad support role. Due to its large size, it must be deployed for firing."
 
 REFERENCE           THE_30CAL_MACHINE_GUN
 LANG_ENGLISH        "The M1919 A6 .30 caliber machine gun is excellent  in the role of squad support. Due to its large size, it must be deployed and cannot be fired on the move. "
@@ -60,6 +60,9 @@ LANG_ENGLISH        "The Tokarev SVT40  is a powerful and accurate semi-automati
 
 REFERENCE           THE_DP28
 LANG_ENGLISH        "The Degtyarev DP28  light machine gun is ideal  in  the squad support role. Due to its large size, it must be deployed before it can be fired."
+
+REFERENCE	    THE_STEN_SILENCED
+LANG_ENGLISH	    "The Silenced Sten Mark 2 is a 9mm submachine gun effective for clearing out rooms, trenches, and nightime special operations. Its light weight and compact frame provide excellent mobility."
 
 REFERENCE           A_M1A1_CARBINE
 LANG_ENGLISH        "a. M1A1 Carbine"
@@ -112,6 +115,11 @@ LANG_ENGLISH        "4. Scoped Mosin-Nagant"
 REFERENCE           C_SVT40
 LANG_ENGLISH        "c. Tokarev SVT40"
 
+REFERENCE           6_M1A1_CARBINE
+LANG_ENGLISH        "6. M1A1 Carbine"
+
+REFERENCE	    7_LEEENFIELD
+LANG_ENGLISH	    "7. Lee-Enfield"
 
 ENDMARKER
 
