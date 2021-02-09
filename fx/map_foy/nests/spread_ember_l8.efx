@@ -1,0 +1,151 @@
+Particle
+{
+	name				smoke_underlit
+
+	spawnFlags			evenDistribution
+
+	count				3
+
+	life				500 750
+
+	delay				0 1000
+
+	cullrange			8000
+
+	origin				0 -5 -5 0 5 5
+
+	wind				50
+
+	rotation			-175 -185
+
+	rotationDelta		-2 2
+
+	velocity			7 -2 -2 15 2 2
+
+	gravity				15 25
+
+	alpha
+	{
+		start			0.5 1
+		end				0
+		parm			0.15
+		flags			linear
+	}
+
+	size
+	{
+		start			10 15
+		end				25 30
+		flags			linear
+	}
+
+	shaders
+	[
+		smoke/smk_p_top_fire_a
+		smoke/smk_p_top_fire_b
+		smoke/smk_p_top_fire_c
+	]
+}
+
+Particle
+{
+	name				smoke
+
+	flags				useAlpha
+
+	spawnFlags			evenDistribution
+
+	count				3
+
+	life				1000 1200
+
+	delay				0 1000
+
+	cullrange			8000
+
+	origin				0 -2 -2 0 2 2
+
+	wind				50
+
+	rotation			-10 10
+
+	rotationDelta		-2 2
+
+	velocity			15 -2 -2 30 2 2
+
+	gravity				15 25
+
+	rgb
+	{
+		end				0.3961 0.3882 0.4039
+	}
+
+	alpha
+	{
+		end				0
+		parm			0.15 0.25
+		flags			linear
+	}
+
+	size
+	{
+		start			10 15
+		end				25 35
+		flags			linear
+	}
+
+	shaders
+	[
+		smoke/smk_p_topsm_blk_a
+		smoke/smk_p_topsm_blk_b
+		smoke/smk_p_topsm_blk_c
+	]
+}
+
+Particle
+{
+	name				spreadingmech
+
+	flags				usePhysics impactKills impactFx
+
+	count				0 1
+
+	life				1000
+
+	delay				700 900
+
+	velocity			50 -150 -150 100 150 150
+
+	gravity				-600 -400
+
+	shaders
+	[
+		misc/glow_red_a
+		misc/glow_red_b
+	]
+
+	impactfx
+	[
+		fx/map_foy/nests/spread_ember_l9
+	]
+}
+
+Decal
+{
+	name				scortchmark
+
+	life				4000 7000
+
+	rotation			0 360
+
+	size
+	{
+		start			25 35
+	}
+
+	shaders
+	[
+		impact/scorch_gen_a
+		impact/scorch_gen_b
+	]
+}

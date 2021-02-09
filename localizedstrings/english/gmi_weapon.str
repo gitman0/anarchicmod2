@@ -1,0 +1,85 @@
+// Note to translators:
+// If a sentence is the same in your language then please change it to "#same"
+//
+// eg:
+// LANG_ENGLISH  "HALT"
+// LANG_GERMAN   "#same"
+//
+// (This is so we can tell which strings have been signed-off as ok to be the same words for QA
+//  and because we do not store duplicate strings, which will then get exported again next time
+//  as being untranslated.)
+//
+VERSION             "1"
+CONFIG              "C:\COD\bin\StringEd\StringEd.cfg"
+FILENOTES           "Strings used in the weapon settings go in this file."
+
+REFERENCE           30CAL
+LANG_ENGLISH        "M1919A6 .30 cal"
+
+REFERENCE           MG34
+LANG_ENGLISH        "MG34"
+
+REFERENCE           SMOKEGRENADE
+LANG_ENGLISH        "Smoke Grenade"
+
+REFERENCE           30CAL_IS_A_RESTRICTED
+LANG_ENGLISH        "The  M1919A6 .30 cal is a restricted weapon"
+
+REFERENCE           MG34_IS_A_RESTRICTED
+LANG_ENGLISH        "The MG34 is a restricted weapon."
+
+REFERENCE           BAZOOKA
+LANG_ENGLISH        "Bazooka"
+
+REFERENCE           BINOCULARS
+LANG_ENGLISH        "Binoculars"
+
+REFERENCE           BINOCULARS_ARTILLERY
+LANG_ENGLISH        "Artillery Binoculars"
+
+REFERENCE           GEWEHR43
+LANG_ENGLISH        "Gewehr 43"
+
+REFERENCE           PANZERSCHRECK
+LANG_ENGLISH        "Panzerschreck"
+
+REFERENCE           FLAMMENWERFER
+LANG_ENGLISH        "Flammenwerfer 41"
+
+REFERENCE           WEBLEY
+LANG_ENGLISH        "Webley MK IV"
+
+REFERENCE           SILENCED_STEN
+LANG_ENGLISH        "Silenced Sten"
+
+REFERENCE           SATCHEL
+LANG_ENGLISH        "Satchel Charge"
+
+REFERENCE           DP28
+LANG_ENGLISH        "Degtyarev DP28"
+
+REFERENCE           TT33
+LANG_ENGLISH        "Tokarev TT33"
+
+REFERENCE           SVT40
+LANG_ENGLISH        "Tokarev SVT40"
+
+REFERENCE           FLAMETHROWER
+LANG_ENGLISH        "Flamethrower"
+
+REFERENCE           COMMANDO
+LANG_ENGLISH        "S.A.S. Commando"
+
+REFERENCE           DP28_IS_A_RESTRICTED
+LANG_ENGLISH        "The Degtyarev DP28 is a restricted weapon"
+
+REFERENCE           GEWEHR43_IS_A_RESTRICTED
+LANG_ENGLISH        "The Gewehr 43 is a restricted weapon"
+
+REFERENCE           SVT40_IS_A_RESTRICTED
+LANG_ENGLISH        "The Tokarev SVT40 is a restricted weapon"
+
+
+ENDMARKER
+
+

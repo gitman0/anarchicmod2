@@ -1,0 +1,26 @@
+Decal
+{
+	name				ground
+
+	life				3e+005
+
+	cullrange			2500
+
+	rotation			0 360
+
+	alpha
+	{
+		start			0.5 0.75
+	}
+
+	size
+	{
+		start			100 250
+	}
+
+	shaders
+	[
+		impact/scorch_gen_a
+		impact/scorch_gen_b
+	]
+}

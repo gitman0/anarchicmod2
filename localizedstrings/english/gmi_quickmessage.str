@@ -1,0 +1,130 @@
+// Note to translators:
+// If a sentence is the same in your language then please change it to "#same"
+//
+// eg:
+// LANG_ENGLISH  "HALT"
+// LANG_GERMAN   "#same"
+//
+// (This is so we can tell which strings have been signed-off as ok to be the same words for QA
+//  and because we do not store duplicate strings, which will then get exported again next time
+//  as being untranslated.)
+//
+VERSION             "1"
+CONFIG              "C:\COD\bin\StringEd\StringEd.cfg"
+FILENOTES           "Strings used in the weapon settings go in this file."
+
+REFERENCE           1_NEED_PICKUP
+LANG_ENGLISH        "1. Need a ride!"
+
+REFERENCE           2_GET_IN_JEEP
+LANG_ENGLISH        "2. Get in the jeep!"
+
+REFERENCE           3_JEEP_FULL
+LANG_ENGLISH        "3. Jeep full!"
+
+REFERENCE           4_GET_ON_GUN
+LANG_ENGLISH        "4. Get on that machine gun!"
+
+REFERENCE           4_NEED_ARMOR
+LANG_ENGLISH        "4. Need armor support!"
+
+REFERENCE           5_JEEP_SPOTTED
+LANG_ENGLISH        "5. Enemy jeep spotted!"
+
+REFERENCE           6_TANK_SPOTTED
+LANG_ENGLISH        "6. Enemy tank spotted!"
+
+REFERENCE           7_HEAVY_TANK_SPOTTED
+LANG_ENGLISH        "7. Enemy heavy tank spotted!"
+
+REFERENCE           8_INCOMING_ARMOR
+LANG_ENGLISH        "8. Incoming armor!"
+
+REFERENCE           5_VEHICLES
+LANG_ENGLISH        "5. Vehicles"
+
+REFERENCE           NEED_PICKUP
+LANG_ENGLISH        "I need a ride!"
+
+REFERENCE           JEEP_FULL
+LANG_ENGLISH        "Full jeep, go!"
+
+REFERENCE           GET_IN_JEEP
+LANG_ENGLISH        "Get in the jeep!"
+
+REFERENCE           GET_ON_GUN
+LANG_ENGLISH        "Get on that machine gun!"
+
+REFERENCE           NEED_ARMOR
+LANG_ENGLISH        "I need armor support!"
+
+REFERENCE           JEEP_SPOTTED
+LANG_ENGLISH        "Enemy jeep spotted!"
+
+REFERENCE           TANK_SPOTTED
+LANG_ENGLISH        "Enemy tank spotted!"
+
+REFERENCE           HEAVY_TANK_SPOTTED
+LANG_ENGLISH        "Enemy heavy tank spotted!"
+
+REFERENCE           INCOMING_ARMOR
+LANG_ENGLISH        "Incoming armor!"
+
+REFERENCE           5_NEED_ARTILLERY
+LANG_ENGLISH        "5. Need artillery support!"
+
+REFERENCE           NEED_ARTILLERY
+LANG_ENGLISH        "Need artillery support!"
+
+REFERENCE           4_REQUESTS
+LANG_ENGLISH        "4. Requests"
+
+REFERENCE           9_REDEPLOY_FORWARD
+LANG_ENGLISH        "9. Redeploy forward!"
+
+REFERENCE           REDEPLOY_FORWARD
+LANG_ENGLISH        "Redeploy forward position!"
+
+REFERENCE           7_SMOKE_OUT
+LANG_ENGLISH        "7. Smoke out!"
+
+REFERENCE           SMOKE_OUT
+LANG_ENGLISH        "Smoke out!"
+
+REFERENCE           8_ENEMY_SPOTTED_AHEAD
+LANG_ENGLISH        "8. Enemy spotted ahead!"
+
+REFERENCE           ENEMY_SPOTTED_AHEAD
+LANG_ENGLISH        "Enemy spotted ahead!"
+
+REFERENCE           9_ENEMY_BEHIND
+LANG_ENGLISH        "9. Enemy behind us!"
+
+REFERENCE           ENEMY_BEHIND
+LANG_ENGLISH        "They are behind us!"
+
+REFERENCE           8_THANK_YOU
+LANG_ENGLISH        "8. Thank you!"
+
+REFERENCE           THANK_YOU
+LANG_ENGLISH        "Thank you!"
+
+REFERENCE           3_NEED_BAZOOKA
+LANG_ENGLISH        "3. Need bazooka support!"
+
+REFERENCE           NEED_BAZOOKA
+LANG_ENGLISH        "Need bazooka support!"
+
+REFERENCE           1_HOLD_YOUR_FIRE
+LANG_ENGLISH        "1. Hold your fire!"
+
+REFERENCE           2_NEED_REINFORCEMENTS
+LANG_ENGLISH        "2. Need reinforcements!"
+
+REFERENCE           NO
+LANG_ENGLISH        "4."
+
+
+ENDMARKER
+
+

@@ -1,0 +1,663 @@
+OrientedParticle
+{
+	name				Fire_ring
+
+	life				150
+
+	delay				25
+
+	rotation			0 360
+
+	rotationDelta		-15 15
+
+	alpha
+	{
+		end				0
+		parm			0.1 0.2
+		flags			linear
+	}
+
+	size
+	{
+		end				75 100
+		flags			linear
+	}
+
+	shaders
+	[
+		fire/fire_ring_org_a
+		fire/fire_ring_org_b
+	]
+}
+
+OrientedParticle
+{
+	name				Fire_ring_blue
+
+	count				0
+
+	life				250 350
+
+	rotation			0 360
+
+	rotationDelta		-15 15
+
+	alpha
+	{
+		end				0
+		parm			0.1 0.2
+		flags			linear
+	}
+
+	size
+	{
+		end				75 100
+		flags			linear
+	}
+
+	shaders
+	[
+		fire/fire_ring_blu_a
+		fire/fire_ring_blu_b
+	]
+}
+
+Particle
+{
+	name				embers
+
+	flags				usePhysics
+
+	count				35
+
+	life				350 3000
+
+	bounce				0.25 0.5
+
+	rotation			0 360
+
+	rotationDelta		-10 10
+
+	velocity			100 -200 -200 400 200 200
+
+	gravity				-600 -400
+
+	rgb
+	{
+		start			0.9961 0.6745 0.2392
+		flags			linear
+	}
+
+	size
+	{
+		start			2
+		end				0
+		flags			linear
+	}
+
+	shaders
+	[
+		misc/glow_red_a
+		misc/glow_red_b
+	]
+}
+
+Particle
+{
+	name				fire_balls
+
+	count				5 6
+
+	life				350
+
+	origin				0 -25 -25 5 25 25
+
+	rotation			0 360
+
+	rotationDelta		-15 15
+
+	velocity			0 -100 -100 25 100 100
+
+	alpha
+	{
+		start			0.5
+		end				0
+		parm			0.1 0.2
+		flags			linear
+	}
+
+	size
+	{
+		start			25 35
+		end				75
+		flags			linear
+	}
+
+	shaders
+	[
+		fire/fire_ball_a
+		fire/fire_ball_b
+		fire/fire_ball_c
+	]
+}
+
+OrientedParticle
+{
+	name				Fire_ground_clip
+
+	life				350
+
+	delay				25
+
+	rotation			0 360
+
+	rotationDelta		-15 15
+
+	alpha
+	{
+		end				0
+		parm			0.1 0.2
+		flags			linear
+	}
+
+	size
+	{
+		start			50
+		end				75 100
+		flags			linear
+	}
+
+	shaders
+	[
+		fire/fire_ball_a
+		fire/fire_ball_b
+		fire/fire_ball_c
+	]
+}
+
+Decal
+{
+	name				scortch
+
+	life				3e+004
+
+	rotation			0 360
+
+	size
+	{
+		start			100
+	}
+
+	shaders
+	[
+		impact/scorch_dirt_a
+		impact/scorch_dirt_b
+	]
+}
+
+Emitter
+{
+	name				gib_glass
+
+	flags				useModel usePhysics
+
+	count				10
+
+	life				5000 5500
+
+	bounce				0.25 0.5
+
+	angle				0 0 0 360 360 360
+
+	angleDelta			-15 -15 -15 15 15 15
+
+	velocity			0 -200 -200 200 200 200
+
+	gravity				-600 -400
+
+	size
+	{
+		start			1 6
+		end				0
+		parm			99
+		flags			nonlinear
+	}
+
+	models
+	[
+		xmodel/m_gib_glass_a
+		xmodel/m_gib_glass_b
+		xmodel/m_gib_glass_c
+	]
+}
+
+Decal
+{
+	name				Liquid
+
+	life				5250
+
+	rotation			0 360
+
+	size
+	{
+		start			100
+	}
+
+	shaders
+	[
+		misc/lamp_oil
+	]
+}
+
+Particle
+{
+	name				smoke_blast
+
+	flags				useAlpha
+
+	count				5 6
+
+	life				350
+
+	origin				0 -25 -25 5 25 25
+
+	rotation			0 360
+
+	rotationDelta		-15 15
+
+	velocity			0 -200 -200 25 200 200
+
+	rgb
+	{
+		start			0.9961 0.6745 0.2392
+		end				0.1961 0.1922 0.2
+		flags			clamp
+	}
+
+	alpha
+	{
+		end				0
+		parm			0.1
+		flags			linear
+	}
+
+	size
+	{
+		start			25 35
+		end				75
+		flags			linear
+	}
+
+	shaders
+	[
+		smoke/smk_p_fractal_wht_a
+		smoke/smk_p_fractal_wht_b
+		smoke/smk_p_fractal_wht_c
+		smoke/smk_p_none_wht_a
+		smoke/smk_p_none_wht_b
+		smoke/smk_p_none_wht_c
+	]
+}
+
+Particle
+{
+	name				smoke_shroom
+
+	flags				useAlpha
+
+	count				2 3
+
+	life				400 500
+
+	delay				0 50
+
+	rotation			-5 5
+
+	rotationDelta		-1 1
+
+	velocity			100 -50 -50 200 50 50
+
+	alpha
+	{
+		end				0
+		parm			0.1 0.2
+		flags			linear
+	}
+
+	size
+	{
+		start			25
+		end				75
+		flags			linear
+	}
+
+	shaders
+	[
+		smoke/smk_p_top_blk_a
+		smoke/smk_p_top_blk_b
+		smoke/smk_p_top_blk_c
+	]
+}
+
+Particle
+{
+	name				embers_spread
+
+	flags				usePhysics impactKills impactFx
+
+	count				5
+
+	life				3000
+
+	delay				3000
+
+	bounce				0.25 0.5
+
+	rotation			0 360
+
+	rotationDelta		-10 10
+
+	velocity			100 -100 -100 200 100 100
+
+	gravity				-600 -400
+
+	rgb
+	{
+		start			0.9961 0.6745 0.2392
+		flags			linear
+	}
+
+	size
+	{
+		start			0
+		end				0
+		flags			linear
+	}
+
+	shaders
+	[
+		misc/glow_red_a
+		misc/glow_red_b
+	]
+
+	impactfx
+	[
+		fx/map_foy/nests/spread_ember_l1
+	]
+}
+
+OrientedParticle
+{
+	name				Copy of Fire_ring
+
+	count				2 3
+
+	life				250 350
+
+	delay				3350 3450
+
+	rotation			0 360
+
+	rotationDelta		-15 15
+
+	alpha
+	{
+		end				0
+		parm			0.1 0.2
+		flags			linear
+	}
+
+	size
+	{
+		end				150 200
+		flags			linear
+	}
+
+	shaders
+	[
+		fire/fire_ring_blu_a
+		fire/fire_ring_blu_b
+	]
+}
+
+Particle
+{
+	name				FF_smoke_underlit
+
+	spawnFlags			evenDistribution
+
+	count				10
+
+	life				1000 1250
+
+	delay				0 4000
+
+	cullrange			8000
+
+	origin				0 -5 -5 0 5 5
+
+	wind				50
+
+	rotation			-175 -185
+
+	rotationDelta		-2 2
+
+	velocity			15 -5 -5 30 5 5
+
+	gravity				15 25
+
+	alpha
+	{
+		start			0.5 1
+		end				0
+		parm			0.15
+		flags			linear
+	}
+
+	size
+	{
+		start			25 35
+		end				50 75
+		flags			linear
+	}
+
+	shaders
+	[
+		smoke/smk_p_top_fire_a
+		smoke/smk_p_top_fire_b
+		smoke/smk_p_top_fire_c
+	]
+}
+
+Particle
+{
+	name				FF_smoke
+
+	flags				useAlpha
+
+	spawnFlags			evenDistribution
+
+	count				10
+
+	life				1500 1750
+
+	delay				0 4000
+
+	cullrange			8000
+
+	origin				0 -5 -5 0 5 5
+
+	wind				50
+
+	rotation			-10 10
+
+	rotationDelta		-2 2
+
+	velocity			30 -5 -5 60 5 5
+
+	gravity				15 25
+
+	rgb
+	{
+		end				0.3961 0.3882 0.4039
+	}
+
+	alpha
+	{
+		end				0
+		parm			0.15 0.25
+		flags			linear
+	}
+
+	size
+	{
+		start			25 35
+		end				50 75
+		flags			linear
+	}
+
+	shaders
+	[
+		smoke/smk_p_topsm_blk_a
+		smoke/smk_p_topsm_blk_b
+		smoke/smk_p_topsm_blk_c
+	]
+}
+
+Particle
+{
+	name				FF_fire_stationary
+
+	spawnFlags			evenDistribution
+
+	count				10
+
+	life				500 750
+
+	delay				0 4000
+
+	cullrange			5000
+
+	origin				-5 -5 -5 5 5 5
+
+	wind				50
+
+	rotation			5 -5
+
+	rotationDelta		2 -2
+
+	velocity			15 -5 -5 25 5 5
+
+	gravity				15 25
+
+	alpha
+	{
+		start			0.5 1
+		end				0
+		parm			0.15
+		flags			linear
+	}
+
+	size
+	{
+		start			15 20
+		end				35 45
+		flags			linear
+	}
+
+	shaders
+	[
+		fire/flame_lick_a
+		fire/flame_lick_b
+		fire/flame_lick_c
+		fire/flame_lick_d
+		fire/flame_lick_e
+		fire/flame_lick_f
+	]
+}
+
+OrientedParticle
+{
+	name				FF_fire_ground
+
+	spawnFlags			evenDistribution
+
+	count				10
+
+	life				750 1000
+
+	delay				0 4000
+
+	rotation			0 360
+
+	rotationDelta		-10 10
+
+	alpha
+	{
+		end				0
+		parm			0.1
+		flags			linear
+	}
+
+	size
+	{
+		start			35 45
+		end				65 75
+		flags			linear
+	}
+
+	shaders
+	[
+		fire/flame_ball_a
+		fire/flame_ball_b
+		fire/flame_ball_c
+	]
+}
+
+Particle
+{
+	name				embers_spread_l9
+
+	flags				usePhysics impactKills impactFx
+
+	count				5
+
+	life				3000
+
+	delay				3000
+
+	bounce				0.25 0.5
+
+	rotation			0 360
+
+	rotationDelta		-10 10
+
+	velocity			100 -100 -100 200 100 100
+
+	gravity				-600 -400
+
+	rgb
+	{
+		start			0.9961 0.6745 0.2392
+		flags			linear
+	}
+
+	size
+	{
+		start			0
+		end				0
+		flags			linear
+	}
+
+	shaders
+	[
+		misc/glow_red_a
+		misc/glow_red_b
+	]
+
+	impactfx
+	[
+		fx/map_foy/nests/spread_ember_l8
+	]
+}

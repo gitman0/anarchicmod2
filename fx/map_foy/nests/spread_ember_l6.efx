@@ -1,0 +1,237 @@
+Particle
+{
+	name				aftersmoke_underlit
+
+	spawnFlags			evenDistribution
+
+	count				2
+
+	life				1000 1250
+
+	delay				0 1000
+
+	cullrange			8000
+
+	origin				0 -5 -5 0 5 5
+
+	wind				50
+
+	rotation			-175 -185
+
+	rotationDelta		-2 2
+
+	velocity			15 -5 -5 30 5 5
+
+	gravity				15 25
+
+	alpha
+	{
+		start			0.5 1
+		end				0
+		parm			0.15
+		flags			linear
+	}
+
+	size
+	{
+		start			25 35
+		end				50 75
+		flags			linear
+	}
+
+	shaders
+	[
+		smoke/smk_p_top_fire_a
+		smoke/smk_p_top_fire_b
+		smoke/smk_p_top_fire_c
+	]
+}
+
+Particle
+{
+	name				aftersmoke
+
+	flags				useAlpha
+
+	spawnFlags			evenDistribution
+
+	count				3
+
+	life				1500 1750
+
+	delay				0 1000
+
+	cullrange			8000
+
+	origin				0 -5 -5 0 5 5
+
+	wind				50
+
+	rotation			-10 10
+
+	rotationDelta		-2 2
+
+	velocity			30 -5 -5 60 5 5
+
+	gravity				15 25
+
+	rgb
+	{
+		end				0.3961 0.3882 0.4039
+	}
+
+	alpha
+	{
+		end				0
+		parm			0.15 0.25
+		flags			linear
+	}
+
+	size
+	{
+		start			25 35
+		end				50 75
+		flags			linear
+	}
+
+	shaders
+	[
+		smoke/smk_p_topsm_blk_a
+		smoke/smk_p_topsm_blk_b
+		smoke/smk_p_topsm_blk_c
+	]
+}
+
+Particle
+{
+	name				afterfire_stationary
+
+	spawnFlags			evenDistribution
+
+	life				500 750
+
+	delay				0 1000
+
+	cullrange			5000
+
+	origin				-5 -5 -5 5 5 5
+
+	wind				50
+
+	rotation			5 -5
+
+	rotationDelta		2 -2
+
+	velocity			15 -5 -5 25 5 5
+
+	gravity				15 25
+
+	alpha
+	{
+		start			0.5 1
+		end				0
+		parm			0.15
+		flags			linear
+	}
+
+	size
+	{
+		start			15 20
+		end				35 45
+		flags			linear
+	}
+
+	shaders
+	[
+		fire/flame_lick_a
+		fire/flame_lick_b
+		fire/flame_lick_c
+		fire/flame_lick_d
+		fire/flame_lick_e
+		fire/flame_lick_f
+	]
+}
+
+OrientedParticle
+{
+	name				fire_ground
+
+	spawnFlags			evenDistribution
+
+	count				2
+
+	life				750 1000
+
+	delay				0 1000
+
+	rotation			0 360
+
+	rotationDelta		-10 10
+
+	alpha
+	{
+		end				0
+		parm			0.1
+		flags			linear
+	}
+
+	size
+	{
+		start			35 45
+		end				65 75
+		flags			linear
+	}
+
+	shaders
+	[
+		fire/flame_ball_a
+		fire/flame_ball_b
+		fire/flame_ball_c
+	]
+}
+
+Particle
+{
+	name				spreadingmech
+
+	flags				usePhysics impactKills impactFx
+
+	life				1000
+
+	delay				700 900
+
+	velocity			50 -250 -250 100 250 250
+
+	gravity				-600 -400
+
+	shaders
+	[
+		misc/glow_red_a
+		misc/glow_red_b
+	]
+
+	impactfx
+	[
+		fx/map_foy/nests/spread_ember_l7
+	]
+}
+
+Decal
+{
+	name				scortchmark
+
+	life				4000 7000
+
+	rotation			0 360
+
+	size
+	{
+		start			25 35
+	}
+
+	shaders
+	[
+		impact/scorch_gen_a
+		impact/scorch_gen_b
+	]
+}
