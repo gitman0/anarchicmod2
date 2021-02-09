@@ -37,7 +37,7 @@
 //			setitemcolor fadebox backcolor 0 0 0 1; 
 			close mods_menu;
 			close options_multi;
-//			play "music_mainmenu";
+			play "mainmenutune";
 //			fadeout fadebox ;
 			uiScript stopRefresh ;
 		}

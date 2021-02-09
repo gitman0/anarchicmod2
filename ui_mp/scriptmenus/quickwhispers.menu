@@ -6,8 +6,7 @@
 {
 	menuDef
 	{
-		name			"quickmessage"
-		visible			0
+		name			"quickwhispers"
 		fullscreen		0
 		rect			0 0 640 480
 		focuscolor		1 1 1 1
@@ -30,7 +29,7 @@
 			visible			1
 			rect			0 0 224 192
 			origin			ORIGIN_QUICKMESSAGEWINDOW
-			style			WINDOW_STYLE_FILLED
+	 		style			WINDOW_STYLE_FILLED
 			forecolor		1 1 1 1
 			backcolor		0 0 0 0.7975
 			decoration
@@ -107,10 +106,11 @@
 			backcolor		1 1 1 .125
 			decoration
 		}
-
+	
 		itemDef
 		{
 			name			"window"
+			group			ingamebox
 			visible			1
 			rect			16 20 0 0
 			origin			ORIGIN_QUICKMESSAGEWINDOW
@@ -118,14 +118,15 @@
 			textfont		UI_FONT_NORMAL
 			textscale		.24
 			textaligny		8
-			text			"@QUICKMESSAGE_1_COMMANDS"
+			text			"@GMI_QUICKMESSAGE_1_HEY"
 			decoration
 		}
-		execKey "1" { close quickmessage; open quickcommands }
+		execKey "1" { scriptMenuResponse "1"; close quickwhispers }
 	
 		itemDef
 		{
 			name			"window"
+			group			ingamebox
 			visible			1
 			rect			16 36 0 0
 			origin			ORIGIN_QUICKMESSAGEWINDOW
@@ -133,14 +134,15 @@
 			textfont		UI_FONT_NORMAL
 			textscale		.24
 			textaligny		8
-			text			"@QUICKMESSAGE_2_STATEMENTS"
+			text			"@GMI_QUICKMESSAGE_2_SHHH"
 			decoration
 		}
-		execKey "2" { close quickmessage; open quickstatements }
+		execKey "2" { scriptMenuResponse "2"; close quickwhispers }
 	
 		itemDef
 		{
 			name			"window"
+			group			ingamebox
 			visible			1
 			rect			16 52 0 0
 			origin			ORIGIN_QUICKMESSAGEWINDOW
@@ -148,14 +150,15 @@
 			textfont		UI_FONT_NORMAL
 			textscale		.24
 			textaligny		8
-			text			"@QUICKMESSAGE_3_RESPONSES"
+			text			"@GMI_QUICKMESSAGE_3_FOLLOW_ME"
 			decoration
 		}
-		execKey "3" { close quickmessage; open quickresponses }
-
+		execKey "3" { scriptMenuResponse "3"; close quickwhispers }
+	
 		itemDef
 		{
 			name			"window"
+			group			ingamebox
 			visible			1
 			rect			16 68 0 0
 			origin			ORIGIN_QUICKMESSAGEWINDOW
@@ -163,14 +166,15 @@
 			textfont		UI_FONT_NORMAL
 			textscale		.24
 			textaligny		8
-			text			"@GMI_QUICKMESSAGE_4_REQUESTS"
+			text			"@GMI_QUICKMESSAGE_4_GET_DOWN"
 			decoration
 		}
-		execKey "4" { close quickmessage; open quickrequests }
-
+		execKey "4" { scriptMenuResponse "4"; close quickwhispers }
+	
 		itemDef
 		{
 			name			"window"
+			group			ingamebox
 			visible			1
 			rect			16 84 0 0
 			origin			ORIGIN_QUICKMESSAGEWINDOW
@@ -178,14 +182,15 @@
 			textfont		UI_FONT_NORMAL
 			textscale		.24
 			textaligny		8
-			text			"@GMI_QUICKMESSAGE_5_VEHICLES"
+			text			"@GMI_QUICKMESSAGE_5_HOLD_THIS_POSITION"
 			decoration
 		}
-		execKey "5" { close quickmessage; open quickvehicles }
-
+		execKey "5" { scriptMenuResponse "5"; close quickwhispers }
+	
 		itemDef
 		{
 			name			"window"
+			group			ingamebox
 			visible			1
 			rect			16 100 0 0
 			origin			ORIGIN_QUICKMESSAGEWINDOW
@@ -193,16 +198,48 @@
 			textfont		UI_FONT_NORMAL
 			textscale		.24
 			textaligny		8
-			text			"@GMI_QUICKMESSAGE_6_WHISPERS"
+			text			"@GMI_QUICKMESSAGE_6_YOURE_ON_POINT"
 			decoration
 		}
-		execKey "6" { close quickmessage; open quickwhispers }
-
+		execKey "6" { scriptMenuResponse "6"; close quickwhispers }
+	
+		itemDef
+		{
+			name			"window"
+			group			ingamebox
+			visible			1
+			rect			16 116 0 0
+			origin			ORIGIN_QUICKMESSAGEWINDOW
+			forecolor		1 1 1 1
+			textfont		UI_FONT_NORMAL
+			textscale		.24
+			textaligny		8
+			text			"@GMI_QUICKMESSAGE_7_DID_YOU_HEAR_SOMETHING"
+			decoration
+		}
+		execKey "7" { scriptMenuResponse "7"; close quickwhispers }
+	
+		itemDef
+		{
+			name			"window"
+			group			ingamebox
+			visible			1
+			rect			16 132 0 0
+			origin			ORIGIN_QUICKMESSAGEWINDOW
+			forecolor		1 1 1 1
+			textfont		UI_FONT_NORMAL
+			textscale		.24
+			textaligny		8
+			text			"@GMI_QUICKMESSAGE_8_WHAT_WAS_THAT"
+			decoration
+		}
+		execKey "8" { scriptMenuResponse "8"; close quickwhispers }
+		
 		itemDef
 		{
 			name			"window"
 			visible			1
-			rect			16 116 0 0
+			rect			16 148 0 0
 			origin			ORIGIN_QUICKMESSAGEWINDOW
 			forecolor		1 1 1 1
 			textfont		UI_FONT_NORMAL

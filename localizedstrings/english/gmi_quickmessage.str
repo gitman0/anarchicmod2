@@ -10,7 +10,7 @@
 //  as being untranslated.)
 //
 VERSION             "1"
-CONFIG              "C:\COD\bin\StringEd\StringEd.cfg"
+CONFIG              "C:\cod\source_data\string_resources\StringEd.cfg"
 FILENOTES           "Strings used in the weapon settings go in this file."
 
 REFERENCE           1_NEED_PICKUP
@@ -124,6 +124,57 @@ LANG_ENGLISH        "2. Need reinforcements!"
 REFERENCE           NO
 LANG_ENGLISH        "4."
 
+
+REFERENCE		6_WHISPERS
+LANG_ENGLISH		"6. Whispers"
+
+REFERENCE		1_HEY
+LANG_ENGLISH		"1. Hey!"
+
+REFERENCE		2_SHHH
+LANG_ENGLISH		"2. Shhh!"
+
+REFERENCE		3_FOLLOW_ME
+LANG_ENGLISH		"3. Follow me."
+
+REFERENCE		4_GET_DOWN
+LANG_ENGLISH		"4. Get down."
+
+REFERENCE		5_HOLD_THIS_POSITION
+LANG_ENGLISH		"5. Hold this position."
+
+REFERENCE		6_YOURE_ON_POINT
+LANG_ENGLISH		"6. You're on point."
+
+REFERENCE		7_DID_YOU_HEAR_SOMETHING
+LANG_ENGLISH		"7. Did you hear something?"
+
+REFERENCE		8_WHAT_WAS_THAT
+LANG_ENGLISH		"8. What was that?"
+
+REFERENCE		WHISP_1_HEY
+LANG_ENGLISH		"Hey!"
+
+REFERENCE		WHISP_2_SHHH
+LANG_ENGLISH		"Shhh!"
+
+REFERENCE		WHISP_3_FOLLOW_ME
+LANG_ENGLISH		"Follow me!"
+
+REFERENCE		WHISP_4_GET_DOWN
+LANG_ENGLISH		"Get down!"
+
+REFERENCE		WHISP_5_HOLD_THIS_POSITION
+LANG_ENGLISH		"Hold this position!"
+
+REFERENCE		WHISP_6_YOURE_ON_POINT
+LANG_ENGLISH		"You're on point."
+
+REFERENCE		WHISP_7_DID_YOU_HEAR_SOMETHING
+LANG_ENGLISH		"Did you hear something?"
+
+REFERENCE		WHISP_8_WHAT_WAS_THAT
+LANG_ENGLISH		"What was that?"
 
 ENDMARKER
 
