@@ -179,7 +179,7 @@ Decal
 {
 	name				scortch
 
-	life				3e+004
+	life				1800000
 
 	rotation			0 360
 
@@ -661,3 +661,5 @@ Particle
 		fx/map_foy/nests/spread_ember_l8
 	]
 }
+
+

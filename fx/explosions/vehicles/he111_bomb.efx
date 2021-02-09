@@ -472,7 +472,7 @@ Decal
 {
 	name				scortch_decal
 
-	life				1.5e+004
+	life				1800000
 
 	cullrange			4000
 
@@ -789,3 +789,5 @@ Particle
 		smoke/smk_p_top_wht_c
 	]
 }
+
+

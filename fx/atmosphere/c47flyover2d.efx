@@ -1,6 +1,6 @@
 OrientedParticle
 {
-	life				1.4e+005
+	life				5e+005
 
 	origin				228 0 400 -128 0 400
 
@@ -28,7 +28,7 @@ OrientedParticle
 {
 	name				Copy of Unnamed OrientedParticl
 
-	life				1.4e+005
+	life				5e+005
 
 	origin				223 532 -192 -123 532 -192
 
@@ -58,7 +58,7 @@ OrientedParticle
 {
 	name				Copy of Copy of Unnamed Oriente
 
-	life				1.4e+005
+	life				5e+005
 
 	origin				223 -732 -242 -123 -732 -242
 
@@ -88,7 +88,7 @@ OrientedParticle
 {
 	name				Copy of Copy of Copy of Copy of
 
-	life				1.4e+005
+	life				5e+005
 
 	origin				243 332 -35 -34 332 -45
 
@@ -118,7 +118,7 @@ OrientedParticle
 {
 	name				Copy of Copy of Copy of Copy of
 
-	life				1.4e+005
+	life				5e+005
 
 	origin				243 -432 -45 -34 -432 -45
 
@@ -148,7 +148,7 @@ OrientedParticle
 {
 	name				Copy of Copy of Copy of Copy of
 
-	life				1.4e+005
+	life				5e+005
 
 	origin				243 -202 215 -34 -202 215
 
@@ -178,7 +178,7 @@ OrientedParticle
 {
 	name				Copy of Copy of Copy of Copy of
 
-	life				1.4e+005
+	life				5e+005
 
 	origin				243 202 215 -23 202 215
 

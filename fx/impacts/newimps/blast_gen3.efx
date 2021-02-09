@@ -221,7 +221,7 @@ Line
 
 Decal
 {
-	life				3e+005
+	life				1800000
 
 	rotation			-360 360
 
@@ -251,3 +251,5 @@ Light
 		flags			linear
 	}
 }
+
+

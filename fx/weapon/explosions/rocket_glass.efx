@@ -126,7 +126,7 @@ Decal
 {
 	name				scortch_mark
 
-	life				2e+004
+	life				1800000
 
 	delay				50 75
 
@@ -487,3 +487,4 @@ FxRunner
 		fx/weapon/explosions/_global_rocket
 	]
 }
+

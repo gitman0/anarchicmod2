@@ -2,7 +2,7 @@ Decal
 {
 	name				impact_mark
 
-	life				5000
+	life				1800000
 
 	cullrange			1000
 
@@ -283,3 +283,5 @@ Light
 		flags			linear
 	}
 }
+
+

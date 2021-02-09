@@ -167,7 +167,7 @@ Emitter
 
 Decal
 {
-	life				7000
+	life				1800000
 
 	cullrange			3200
 
@@ -188,3 +188,5 @@ Decal
 		gfx/impact/bullethit_snow
 	]
 }
+
+

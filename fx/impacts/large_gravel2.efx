@@ -119,7 +119,7 @@ Emitter
 
 Decal
 {
-	life				7000
+	life				1800000
 
 	rotation			360 -360
 
@@ -138,3 +138,5 @@ Decal
 		gfx/impact/bullethit_snow
 	]
 }
+
+

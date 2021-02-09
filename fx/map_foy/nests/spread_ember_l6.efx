@@ -220,7 +220,7 @@ Decal
 {
 	name				scortchmark
 
-	life				4000 7000
+	life				1800000
 
 	rotation			0 360
 
@@ -235,3 +235,5 @@ Decal
 		impact/scorch_gen_b
 	]
 }
+
+

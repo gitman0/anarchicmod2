@@ -61,7 +61,7 @@ Decal
 {
 	name				impact_mark
 
-	life				5000
+	life				1800000
 
 	cullrange			1200
 
@@ -317,3 +317,5 @@ Particle
 		debree/debree_gib_dirt_b
 	]
 }
+
+

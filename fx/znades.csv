@@ -1,0 +1,36 @@
+# This file maps impact types to effects,,
+"# It can be overridden in part by just specifying some effects in a CSV file in the ""fx"" folder that has a later name alphabetically,,"
+# It has the simple syntax that the first column is the impact type, the second is the surface type, and the thrid is the effect name,,
+# The impact type is one of: bullet_small_normal, bullet_small_reflect, bullet_large_normal, bullet_large_reflect, grenade_bounce, and grenade_explode,,
+"# The surface type is one of the valid surface impact types for the surfaceparm shader command, or ""default"".  Default is only used if the code cannot figure out the correct surface type,,"
+# The effect name should be a full path, including extension, to the effect to play for this type of impact on this type of surface,,
+# The effect name may be left blank, in which case no effect is played for this impact.,,
+# If any impact effect has no row entry in any file, the game will not load any maps.  The console lists which surface types had no entries.,,
+# These effects usually should not specify sounds, since a corresponding sound alias will be played at the same time as the effect,,
+# For bullet hits, two effects are played, either or both of which may be blank:,,
+"# The ""normal"" effect is played at the impact point facing the surface normal.  This should usually be used for decals.,,"
+"# The ""reflect"" effect is played at the impact point facing the direction of impact reflected off the surface.,,"
+
+grenade_explode,default,fx/impacts/newimps/v_blast1.efx
+grenade_explode,bark,fx/impacts/newimps/v_blast1.efx
+grenade_explode,brick,fx/impacts/newimps/v_blast1.efx
+grenade_explode,carpet,fx/impacts/newimps/v_blast1.efx
+grenade_explode,cloth,fx/impacts/newimps/v_blast1.efx
+grenade_explode,concrete,fx/impacts/newimps/v_blast1.efx
+grenade_explode,dirt,fx/impacts/newimps/v_blast1dirt.efx
+grenade_explode,flesh,fx/impacts/newimps/v_blast1.efx
+grenade_explode,foliage,fx/impacts/newimps/v_blast1.efx
+grenade_explode,glass,fx/impacts/newimps/v_blast1.efx
+grenade_explode,grass,fx/impacts/newimps/v_blast1dirt.efx
+grenade_explode,gravel,fx/impacts/newimps/v_blast1dirt.efx
+grenade_explode,ice,fx/impacts/newimps/v_blast1.efx
+grenade_explode,metal,fx/impacts/newimps/v_blast1.efx
+grenade_explode,mud,fx/impacts/newimps/v_blast1dirt.efx
+grenade_explode,paper,fx/impacts/newimps/v_blast1.efx
+grenade_explode,plaster,fx/impacts/newimps/v_blast1dirt.efx
+grenade_explode,rock,fx/impacts/newimps/v_blast1.efx
+grenade_explode,sand,fx/impacts/newimps/v_blast1dirt.efx
+grenade_explode,snow,fx/impacts/snow_mortarlite.efx
+grenade_explode,water,fx/explosions/grenade_water.efx
+grenade_explode,wood,fx/impacts/newimps/v_blast1wood.efx
+grenade_explode,asphalt,fx/impacts/newimps/v_blast1.efx

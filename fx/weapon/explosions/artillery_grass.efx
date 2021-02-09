@@ -131,7 +131,7 @@ Decal
 {
 	name				scortch_mark
 
-	life				5000
+	life				1800000
 
 	delay				50 75
 
@@ -805,3 +805,5 @@ Particle
 		debree/debree_gib_grass_b
 	]
 }
+
+

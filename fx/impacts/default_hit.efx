@@ -122,7 +122,7 @@ Particle
 
 Decal
 {
-	life				8000
+	life				1800000
 
 	cullrange			1200
 
@@ -139,3 +139,5 @@ Decal
 		gfx/impact/bullethole2
 	]
 }
+
+

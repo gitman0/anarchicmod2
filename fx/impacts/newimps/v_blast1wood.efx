@@ -149,7 +149,7 @@ Emitter
 
 Decal
 {
-	life				1e+004
+	life				1800000
 
 	rotation			360 -360
 
@@ -316,3 +316,5 @@ Particle
 		gfx/effects/medium_smoke
 	]
 }
+
+

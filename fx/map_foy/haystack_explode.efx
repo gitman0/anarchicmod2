@@ -732,7 +732,7 @@ Decal
 {
 	name				scortch_mark
 
-	life				1.2e+005
+	life				1800000
 
 	delay				50 75
 
@@ -750,3 +750,5 @@ Decal
 		impact/scorch_hay_a
 	]
 }
+
+

@@ -296,7 +296,7 @@ Emitter
 
 Decal
 {
-	life				1e+004
+	life				1800000
 
 	size
 	{
@@ -344,3 +344,5 @@ Line
 		gfx/effects/explosion/dirtplume_modelf
 	]
 }
+
+

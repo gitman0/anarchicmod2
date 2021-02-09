@@ -1,6 +1,6 @@
 Decal
 {
-	life				1e+004
+	life				1800000
 
 	cullrange			3200
 
@@ -39,3 +39,5 @@ Emitter
 		xmodel/gib_glass2
 	]
 }
+
+

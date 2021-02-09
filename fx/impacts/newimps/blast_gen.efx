@@ -201,6 +201,8 @@ Light
 
 Decal
 {
+	life				1800000
+
 	rotation			360 -360
 
 	size
@@ -213,3 +215,5 @@ Decal
 		gfx/impact/cratered_ground
 	]
 }
+
+

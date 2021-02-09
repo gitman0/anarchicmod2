@@ -121,7 +121,7 @@ Emitter
 
 Decal
 {
-	life				1e+004
+	life				1800000
 
 	cullrange			3200
 
@@ -138,3 +138,5 @@ Decal
 		gfx/impact/bullethit_plaster2
 	]
 }
+
+

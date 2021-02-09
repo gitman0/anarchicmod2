@@ -4,27 +4,25 @@ Particle
 
 	flags				setShaderTime useAlpha
 
-	spawnFlags			evenDistribution rgbComponentInterpolation affectedByWind
+	spawnFlags			evenDistribution rgbComponentInterpolation
 
-	life				1500 1750
+	life				8000 10000
 
-	delay				0 100
+	delay				0 80
 
-	cullrange			3000
+	cullrange			75000
 
-	radius				60 50
-
-	wind				95 100
+	radius				0 50
 
 	rotation			0 360
 
-	rotationDelta		-15 15
+	rotationDelta			-0.1 0.1
 
-	velocity			-12 -12 -12 12 12 12
+	velocity			-0.2 -0.2 -0.2 0.2 0.2 0.2
 
-	acceleration		-12 -12 -12 12 12 12
+	acceleration			-1 -1 -1 1 1 1
 
-	gravity				5 25
+	gravity				0 0
 
 	rgb
 	{
@@ -43,7 +41,7 @@ Particle
 
 	size
 	{
-		start			15
+		start			25
 		end				30 50
 		flags			linear
 	}

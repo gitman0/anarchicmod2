@@ -61,7 +61,7 @@ Decal
 {
 	name				impact_mark
 
-	life				1e+004
+	life				1800000
 
 	cullrange			800
 
@@ -175,3 +175,5 @@ Particle
 		debree/debree_gib_concrete_b
 	]
 }
+
+

@@ -58,7 +58,7 @@ Decal
 {
 	name				impact_mark
 
-	life				2e+004
+	life				1800000
 
 	cullrange			800
 
@@ -216,3 +216,5 @@ Particle
 		misc/glow_yellow_b
 	]
 }
+
+

@@ -125,7 +125,7 @@ Decal
 {
 	name				scortch_mark
 
-	life				5000
+	life				1800000
 
 	delay				50 75
 
@@ -665,3 +665,5 @@ FxRunner
 		fx/weapon/explosions/_global_tank
 	]
 }
+
+

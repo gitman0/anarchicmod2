@@ -251,7 +251,7 @@ FxRunner
 
 Decal
 {
-	life				4e+004
+	life				1800000
 
 	rotation			360 -360
 
@@ -265,3 +265,5 @@ Decal
 		gfx/impact/cratered
 	]
 }
+
+

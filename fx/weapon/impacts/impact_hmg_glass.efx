@@ -58,7 +58,7 @@ Decal
 {
 	name				impact_mark
 
-	life				5000
+	life				1800000
 
 	cullrange			800
 
@@ -163,3 +163,5 @@ Emitter
 		xmodel/m_gib_glass_c
 	]
 }
+
+

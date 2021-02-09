@@ -2,7 +2,7 @@ Decal
 {
 	name				ground
 
-	life				3e+005
+	life				1800000
 
 	cullrange			2500
 
@@ -24,3 +24,5 @@ Decal
 		impact/scorch_gen_b
 	]
 }
+
+
