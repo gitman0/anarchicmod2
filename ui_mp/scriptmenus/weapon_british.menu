@@ -35,8 +35,11 @@
 			hide enfield_info;
 			hide sten_info;
 			hide bren_info;
+			hide sten_silenced_info;
 			hide springfield_info;
+			hide m1carbine_info;
 			hide mg30cal_info;
+			hide m1carbine_info;
 		}
 
 // WINDOW BACKGROUND
@@ -454,12 +457,88 @@
 				hide bren_info;
 				hide springfield_info;
 				hide mg30cal_info;
+				hide m1carbine_info;
+				hide sten_silenced_info;
 				play "mouse_over";
 				show enfield_info;
 				show weapon_propertiestext;
 			}
 		}
 		execKey "1" { play "mouse_click"; scriptMenuResponse "enfield_mp"; close weapon_british }
+
+		itemDef 
+		{
+			name			"button_m1carbine"
+			visible			1
+			rect			WEAPON_BUTTON_RECT_SIXTH
+			origin			ORIGIN_MENUWINDOW
+			forecolor		1 1 1 1
+			type			ITEM_TYPE_BUTTON
+			text			"@GMI_MPMENU_6_M1A1_CARBINE"
+			textfont		UI_FONT_NORMAL
+			textscale		.24
+			textalignx		8
+			textaligny		16
+			cvartest		"ui_allow_m1carbine"
+			hideCvar		{ "0" }
+			action
+			{
+				play "mouse_click";
+				scriptMenuResponse "m1carbine_mp";
+				close weapon_british;
+			}
+			onFocus
+			{
+				hide sten_info;
+				hide bren_info;
+				hide m1carbine_info;
+				hide sten_silenced_info;
+				hide springfield_info;
+				hide mg30cal_info;
+				play "mouse_over";
+				show m1carbine_info;
+				show weapon_propertiestext;
+			}
+		}
+		execKey "6" { play "mouse_click"; scriptMenuResponse "m1carbine_mp"; close weapon_british }
+
+            	itemDef 
+		{
+			name			"button_sten_silenced"
+			visible			1
+			rect			WEAPON_BUTTON_RECT_SEVENTH
+			origin			ORIGIN_MENUWINDOW
+			forecolor		1 1 1 1
+			type			ITEM_TYPE_BUTTON
+			text			"@7. Silenced Sten"
+			textfont		UI_FONT_NORMAL
+			textscale		.24
+			textalignx		8
+			textaligny		16
+			cvartest		"ui_allow_sten_silenced"
+			hideCvar		{ "0" }
+			action
+			{
+				play "mouse_click";
+				scriptMenuResponse "sten_silenced_mp";
+				close weapon_british;
+			}
+			onFocus
+			{
+				hide enfield_info;
+				hide sten_info;
+				hide bren_info;
+				hide springfield_info;
+				hide m1carbine_info;
+				hide mg30cal_info;
+				hide sten_silenced_info;
+				play "mouse_over";
+				show sten_silenced_info;
+				show weapon_propertiestext;
+			}
+		}
+		execKey "7" { play "mouse_click"; scriptMenuResponse "sten_silenced_mp"; close weapon_british }		
+
 		
 		itemDef 
 		{
@@ -486,7 +565,9 @@
 			{
 				hide enfield_info;
 				hide bren_info;
+				hide m1carbine_info;
 				hide springfield_info;
+				hide sten_silenced_info;
 				hide mg30cal_info;
 				play "mouse_over";
 				show sten_info;
@@ -521,6 +602,8 @@
 				hide enfield_info;
 				hide sten_info;
 				hide springfield_info;
+				hide sten_silenced_info;
+				hide m1carbine_info;
 				hide mg30cal_info;
 				play "mouse_over";
 				show bren_info;
@@ -556,6 +639,8 @@
 				hide sten_info;
 				hide bren_info;
 				hide mg30cal_info;
+				hide sten_silenced_info;
+				hide m1carbine_info;
 				play "mouse_over";
 				show springfield_info;
 				show weapon_propertiestext;
@@ -590,6 +675,8 @@
 				hide sten_info;
 				hide bren_info;
 				hide springfield_info;
+				hide sten_silenced_info;
+				hide m1carbine_info;
 				play "mouse_over";
 				show mg30cal_info;
 				show weapon_propertiestext;
@@ -608,6 +695,17 @@
 			background		"ui_mp/assets/hud@enfield.tga"
 			decoration
 		}
+		itemDef
+		{
+			name			"m1carbine_info"
+			visible 		0
+			rect			0 0 224 112
+			origin			ORIGIN_WEAPONIMAGE
+	 		style			WINDOW_STYLE_SHADER
+			background		"ui_mp/assets/hud@m1carbine.tga"
+			decoration
+		}
+
 		itemDef
 		{
 			name			"sten_info"
@@ -648,6 +746,16 @@
 			background		"ui_mp/assets/hud@30cal.dds"
 			decoration
 		}
+		itemDef
+		{
+			name			"sten_silenced_info"
+			visible 		0
+			rect			0 0 224 112
+			origin			ORIGIN_WEAPONIMAGE
+	 		style			WINDOW_STYLE_SHADER
+			background		"ui_mp/assets/hud@sten_silenced.tga"
+			decoration
+		}
 
 // WEAPON DESCRIPTIONS
 		itemDef
@@ -663,6 +771,20 @@
 			textscale		.24
 			decoration
 		}
+		itemDef
+		{
+			name			"m1carbine_info"
+			visible 		0
+			rect			0 0 224 64
+			origin			ORIGIN_WEAPONTEXT
+			forecolor		1 1 1 1
+			autowrapped
+			text			"@MPMENU_THE_M1A1_CARBINE_IS_A"
+			textfont		UI_FONT_NORMAL
+			textscale		.24
+			decoration
+		}
+
 		itemDef
 		{
 			name			"sten_info"
@@ -715,6 +837,20 @@
 			textscale		.24
 			decoration
 		}
+            	itemDef
+		{
+			name			"sten_silenced_info"
+			visible 		0
+			rect			0 0 224 64
+			origin			ORIGIN_WEAPONTEXT
+			forecolor		1 1 1 1
+			autowrapped
+			text			"@GMI_MPMENU_THE_STEN_SILENCED"
+			textfont		UI_FONT_NORMAL
+			textscale		.24
+			decoration
+		}
+
 		
 // WEAPON PROPERTIES
 		itemDef
@@ -792,6 +928,68 @@
 	 		style			WINDOW_STYLE_FILLED
 			decoration
 		}
+		itemDef
+		{
+			name			"m1carbine_info"
+			visible 		0
+			rect			0 0 128 10
+			origin			ORIGIN_WEAPONACCURACY
+			backcolor		1 1 1 .125
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+		itemDef
+		{
+			name			"m1carbine_info"
+			visible 		0
+			rect			0 0 61 10
+			origin			ORIGIN_WEAPONACCURACY
+			backcolor		1 1 1 1
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+
+		itemDef
+		{
+			name			"m1carbine_info"
+			visible 		0
+			rect			0 0 128 10
+			origin			ORIGIN_WEAPONDAMAGE
+			backcolor		1 1 1 .125
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+		itemDef
+		{
+			name			"m1carbine_info"
+			visible 		0
+			rect			0 0 80 10
+			origin			ORIGIN_WEAPONDAMAGE
+			backcolor		1 1 1 1
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+
+		itemDef
+		{
+			name			"m1carbine_info"
+			visible 		0
+			rect			0 0 128 10
+			origin			ORIGIN_WEAPONMOBILITY
+			backcolor		1 1 1 .125
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+		itemDef
+		{
+			name			"m1carbine_info"
+			visible 		0
+			rect			0 0 121 10
+			origin			ORIGIN_WEAPONMOBILITY
+			backcolor		1 1 1 1
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
 
 		itemDef
 		{
@@ -855,6 +1053,69 @@
 	 		style			WINDOW_STYLE_FILLED
 			decoration
 		}
+
+		itemDef
+		{
+			name			"sten_silenced_info"
+			visible 		0
+			rect			0 0 128 10
+			origin			ORIGIN_WEAPONACCURACY
+			backcolor		1 1 1 .125
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+		itemDef
+		{
+			name			"sten_silenced_info"
+			visible 		0
+			rect			0 0 46 10
+			origin			ORIGIN_WEAPONACCURACY
+			backcolor		1 1 1 1
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+		itemDef
+		{
+			name			"sten_silenced_info"
+			visible 		0
+			rect			0 0 128 10
+			origin			ORIGIN_WEAPONDAMAGE
+			backcolor		1 1 1 .125
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+		itemDef
+		{
+			name			"sten_silenced_info"
+			visible 		0
+			rect			0 0 77 10
+			origin			ORIGIN_WEAPONDAMAGE
+			backcolor		1 1 1 1
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+
+		itemDef
+		{
+			name			"sten_silenced_info"
+			visible 		0
+			rect			0 0 128 10
+			origin			ORIGIN_WEAPONMOBILITY
+			backcolor		1 1 1 .125
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+		itemDef
+		{
+			name			"sten_silenced_info"
+			visible 		0
+			rect			0 0 120 10
+			origin			ORIGIN_WEAPONMOBILITY
+			backcolor		1 1 1 1
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+
 
 		itemDef
 		{

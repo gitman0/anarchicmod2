@@ -32,6 +32,7 @@
 		onClose
 		{
 			scriptMenuResponse "close";
+			hide enfield_info;
 			hide m1carbine_info;
 			hide m1garand_info;
 			hide thompson_info;
@@ -450,6 +451,7 @@
 			}
 			onFocus
 			{
+				hide enfield_info;
 				hide m1garand_info;
 				hide thompson_info;
 				hide bar_info;
@@ -485,6 +487,7 @@
 			}
 			onFocus
 			{
+				hide enfield_info;
 				hide m1carbine_info;
 				hide thompson_info;
 				hide bar_info;
@@ -520,6 +523,7 @@
 			}
 			onFocus
 			{
+				hide enfield_info;
 				hide m1carbine_info;
 				hide m1garand_info;
 				hide bar_info;
@@ -555,6 +559,7 @@
 			}
 			onFocus
 			{
+				hide enfield_info;
 				hide m1carbine_info;
 				hide m1garand_info;
 				hide thompson_info;
@@ -590,6 +595,7 @@
 			}
 			onFocus
 			{
+				hide enfield_info;
 				hide m1carbine_info;
 				hide m1garand_info;
 				hide thompson_info;
@@ -625,6 +631,7 @@
 			}
 			onFocus
 			{
+				hide enfield_info;
 				hide m1carbine_info;
 				hide m1garand_info;
 				hide thompson_info;
@@ -637,8 +644,55 @@
 		}
 		execKey "6" { play "mouse_click"; scriptMenuResponse "mg30cal_mp"; close weapon_american }
 
+		itemDef 
+		{
+			name			"button_enfield"
+			visible			1
+			rect			WEAPON_BUTTON_RECT_SEVENTH
+			origin			ORIGIN_MENUWINDOW
+			forecolor		1 1 1 1
+			type			ITEM_TYPE_BUTTON
+			text			"@GMI_MPMENU_7_LEEENFIELD"
+			textfont		UI_FONT_NORMAL
+			textscale		.24
+			textalignx		8
+			textaligny		16
+			cvartest		"ui_allow_enfield"
+			hideCvar		{ "0" }
+			action
+			{
+				play "mouse_click";
+				scriptMenuResponse "enfield_mp";
+				close weapon_american;
+			}
+			onFocus
+			{
+				hide thompson_info;
+				hide bar_info;
+				hide m1carbine_info;
+				hide springfield_info;
+				hide mg30cal_info;
+				hide m1carbine_info;
+				play "mouse_over";
+				show enfield_info;
+				show weapon_propertiestext;
+			}
+		}
+		execKey "7" { play "mouse_click"; scriptMenuResponse "enfield_mp"; close weapon_american }
+
 		
 // WEAPON IMAGES
+		itemDef
+		{
+			name			"enfield_info"
+			visible 		0
+			rect			0 -2 224 112
+			origin			ORIGIN_WEAPONIMAGE
+	 		style			WINDOW_STYLE_SHADER
+			background		"ui_mp/assets/hud@enfield.tga"
+			decoration
+		}
+
 		itemDef
 		{
 			name			"m1carbine_info"
@@ -700,7 +754,22 @@
 			decoration
 		}
 
+
 // WEAPON DESCRIPTIONS
+		itemDef
+		{
+			name			"enfield_info"
+			visible 		0
+			rect			0 0 224 64
+			origin			ORIGIN_WEAPONTEXT
+			forecolor		1 1 1 1
+			autowrapped
+			text			"@MPMENU_THE_LEEENFIELD_RIFLE"
+			textfont		UI_FONT_NORMAL
+			textscale		.24
+			decoration
+		}
+
 		itemDef
 		{
 			name			"m1carbine_info"
@@ -793,6 +862,70 @@
 			textscale		.24
 			decoration
 		}
+
+		itemDef
+		{
+			name			"enfield_info"
+			visible 		0
+			rect			0 0 128 10
+			origin			ORIGIN_WEAPONACCURACY
+			backcolor		1 1 1 .125
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+		itemDef
+		{
+			name			"enfield_info"
+			visible 		0
+			rect			0 0 90 10
+			origin			ORIGIN_WEAPONACCURACY
+			backcolor		1 1 1 1
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+
+		itemDef
+		{
+			name			"enfield_info"
+			visible 		0
+			rect			0 0 128 10
+			origin			ORIGIN_WEAPONDAMAGE
+			backcolor		1 1 1 .125
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+		itemDef
+		{
+			name			"enfield_info"
+			visible 		0
+			rect			0 0 128 10
+			origin			ORIGIN_WEAPONDAMAGE
+			backcolor		1 1 1 1
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+
+		itemDef
+		{
+			name			"enfield_info"
+			visible 		0
+			rect			0 0 128 10
+			origin			ORIGIN_WEAPONMOBILITY
+			backcolor		1 1 1 .125
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+		itemDef
+		{
+			name			"enfield_info"
+			visible 		0
+			rect			0 0 114 10
+			origin			ORIGIN_WEAPONMOBILITY
+			backcolor		1 1 1 1
+	 		style			WINDOW_STYLE_FILLED
+			decoration
+		}
+
 
 		itemDef
 		{

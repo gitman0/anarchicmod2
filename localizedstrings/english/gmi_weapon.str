@@ -10,7 +10,7 @@
 //  as being untranslated.)
 //
 VERSION             "1"
-CONFIG              "C:\COD\bin\StringEd\StringEd.cfg"
+CONFIG              "C:\Projects\Cod\source_data\string_resources\StringEd.cfg"
 FILENOTES           "Strings used in the weapon settings go in this file."
 
 REFERENCE           30CAL
@@ -78,6 +78,15 @@ LANG_ENGLISH        "The Gewehr 43 is a restricted weapon"
 
 REFERENCE           SVT40_IS_A_RESTRICTED
 LANG_ENGLISH        "The Tokarev SVT40 is a restricted weapon"
+
+REFERENCE           SILENCED_STEN_IS_A_RESTRICTED
+LANG_ENGLISH        "The Silenced Sten is a restricted weapon."
+
+REFERENCE	    EQUIPPED_WITH_AN
+LANG_ENGLISH	    "You have been equipped with an "
+
+REFERENCE	    EQUIPPED_WITH_A
+LANG_ENGLISH	    "You have been equipped with a "
 
 
 ENDMARKER
