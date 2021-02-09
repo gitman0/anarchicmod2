@@ -324,6 +324,141 @@
 			hideCvar		{ "1" }
 		}
 
+// FAVORITES BUTTON
+		itemDef
+		{
+			name			"button_favs_top"
+			visible			1
+			rect			154 259 140 1
+			origin			ORIGIN_MENUTABS
+			style			WINDOW_STYLE_FILLED
+			backcolor		1 1 1 .4
+			decoration
+		}
+		itemDef
+		{
+			name			"button_favs_bottom"
+			visible			1
+			rect			154 293 140 1
+			origin			ORIGIN_MENUTABS
+			style			WINDOW_STYLE_FILLED
+			backcolor		1 1 1 .4
+			decoration
+		}
+		itemDef
+		{
+			name			"button_favs_left"
+			visible			1
+			rect			153 259 1 35
+			origin			ORIGIN_MENUTABS
+			style			WINDOW_STYLE_FILLED
+			backcolor		1 1 1 .4
+			decoration
+		}
+
+		itemDef
+		{
+			name			"button_favs_right"
+			visible			1
+			rect			294 259 1 35
+			origin			ORIGIN_MENUTABS
+			style			WINDOW_STYLE_FILLED
+			backcolor		1 1 1 .4
+			decoration
+		}
+
+		itemDef
+		{
+			name			"button_favs"
+			visible			1
+			rect			154 260 140 32
+			origin			ORIGIN_MENUTABS
+			style			WINDOW_STYLE_FILLED
+			forecolor		1 1 1 1
+			backcolor		0 1 0 .225
+			type			ITEM_TYPE_BUTTON
+			text			"Add Us To Your Favorites!"
+			textfont		UI_FONT_NORMAL
+			textscale		.24
+			textalignx		70
+			textaligny		21
+			textalign		ITEM_ALIGN_CENTER
+			onFocus
+			{
+				play "mouse_over";
+			}
+			action
+			{
+				play "mouse_click" ; 
+				setcvar ui_favoriteName "|ax| anarchic!bas"
+				setcvar ui_favoriteAddress "wretched.anarchic-x.net"
+				uiScript CreateFavorite ;
+				setcvar ui_favoriteName "|ax| anarchic!tdm"
+				setcvar ui_favoriteAddress "uotdm.anarchic-x.net"
+				uiScript CreateFavorite ;
+				open fav_message_popmenu ;	
+			}
+
+		}
+// SQUAD BUTTON
+/*		itemDef
+		{
+			name			"button_squad"
+			visible			1
+			rect			339 80 90 26
+			origin			ORIGIN_MENUTABS
+			style			WINDOW_STYLE_FILLED
+			forecolor		1 1 1 1
+			backcolor		1 1 1 .125
+			type			ITEM_TYPE_BUTTON
+			text			"Squad Tutorial"
+			textfont		UI_FONT_NORMAL
+			textscale		.24
+			textalignx		45
+			textaligny		18
+			textalign		ITEM_ALIGN_CENTER
+			action
+			{
+				play "mouse_click";
+				scriptMenuResponse "viewmap";
+				close team_americangerman;
+			}
+			onFocus
+			{
+				play "mouse_over";
+			}
+		}
+// TEAMSPEAK BUTTON
+		itemDef
+		{
+			name			"button_squad"
+			visible			1
+			rect			339 120 90 26
+			origin			ORIGIN_MENUTABS
+			style			WINDOW_STYLE_FILLED
+			forecolor		1 1 1 1
+			backcolor		1 1 1 .125
+			type			ITEM_TYPE_BUTTON
+			text			"Teamspeak Info"
+			textfont		UI_FONT_NORMAL
+			textscale		.24
+			textalignx		45
+			textaligny		18
+			textalign		ITEM_ALIGN_CENTER
+			action
+			{
+				play "mouse_click";
+				scriptMenuResponse "viewmap";
+				close team_americangerman;
+			}
+			onFocus
+			{
+				play "mouse_over";
+			}
+		}
+
+*/
+
 // VIEW MAP BUTTON
 		itemDef
 		{
