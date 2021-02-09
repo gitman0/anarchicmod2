@@ -20,6 +20,8 @@ main()
 	game["german_soldiertype"] = "fallschirmjagercamo";
 	game["german_soldiervariation"] = "normal";
 
+	game["compass_range"] = 2816;	// CompassFix
+
 	game["layoutimage"] = "mp_stanjel.dds";
 	game["dom_layoutimage"] = "mp_stanjel_dom.dds";
 	game["ctf_layoutimage"] = "mp_stanjel_ctf.dds";

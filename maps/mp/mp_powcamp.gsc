@@ -6,10 +6,10 @@ main()
 	maps\mp\_load::main();
 	maps\mp\mp_powcamp_fx::main();
 	
-	game["allies"] = "russian";
+	game["allies"] = "american";
 	game["axis"] = "german";
 
-	game["russian_soldiertype"] = "conscript";
+	game["russian_soldiertype"] = "airborne";
 	game["russian_soldiervariation"] = "normal";
 	game["german_soldiertype"] = "wehrmacht";
 	game["german_soldiervariation"] = "normal";

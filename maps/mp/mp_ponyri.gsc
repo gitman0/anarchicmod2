@@ -14,6 +14,11 @@ main()
 	game["allies"] = "russian";
 	game["axis"] = "german";
 
+	game["russian_soldiertype"] = "conscript";
+	game["russian_soldiervariation"] = "normal";
+	game["german_soldiertype"] = "waffen";
+	game["german_soldiervariation"] = "winter";
+
 	game["attackers"] = "axis";
 	game["defenders"] = "allies";
 

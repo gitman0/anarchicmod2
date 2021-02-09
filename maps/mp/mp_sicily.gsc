@@ -16,11 +16,13 @@ main()
 
 	game["british_soldiertype"] = "commando";
 	game["british_soldiervariation"] = "normal";
-	game["german_soldiertype"] = "wehrmacht";
+	game["german_soldiertype"] = "fallschirmjagergrey";
 	game["german_soldiervariation"] = "normal";
 
 	game["attackers"] = "allies";
 	game["defenders"] = "axis";
+
+	game["compass_range"] = 4096;	// CompassFix
 	
 	game["layoutimage"] = "mp_sicily.dds";
 

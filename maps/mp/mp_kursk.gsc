@@ -1,6 +1,7 @@
 main()
 {
-	setExpFog (0.00005, .72, .59, .63, 0 );
+	//setExpFog (0.00005, .72, .59, .63, 0 );
+	setCullFog (0, 7000, .32, .36, .40, 0);
 	ambientPlay("ambient_mp_kursk");
 
 	// Looping windmill sounds -SG
@@ -18,6 +19,11 @@ main()
 
 	game["allies"] = "russian";
 	game["axis"] = "german";
+
+	game["russian_soldiertype"] = "conscript";
+	game["russian_soldiervariation"] = "normal";
+	game["german_soldiertype"] = "waffen";
+	game["german_soldiervariation"] = "normal";
 
 	game["hud_allies_victory_image"]= "gfx/hud/hud@mp_victory_kursk_r.dds";
 	game["hud_axis_victory_image"] = "gfx/hud/hud@mp_victory_kursk_g.dds";

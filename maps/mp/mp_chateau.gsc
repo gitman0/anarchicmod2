@@ -6,11 +6,11 @@ main()
 	maps\mp\_load::main();
 	//maps\mp\mp_chateau_fx::main();
 
-	game["allies"] = "british";
+	game["allies"] = "russian";
 	game["axis"] = "german";
 
-	game["british_soldiertype"] = "airborne";
-	game["british_soldiervariation"] = "normal";
+	game["russian_soldiertype"] = "conscript";
+	game["russian_soldiervariation"] = "winter";
 	game["german_soldiertype"] = "wehrmacht";
 	game["german_soldiervariation"] = "normal";
 

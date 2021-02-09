@@ -17,7 +17,7 @@ main()
 
 	game["british_soldiertype"] = "airborne";
 	game["british_soldiervariation"] = "normal";
-	game["german_soldiertype"] = "wehrmacht";
+	game["german_soldiertype"] = "fallschirmjagergrey";
 	game["german_soldiervariation"] = "normal";
 
 	game["attackers"] = "allies";
@@ -25,6 +25,7 @@ main()
 	
 	game["layoutimage"] = "mp_cassino.dds";
 
+	game["compass_range"] = 2816;	// CompassFix
 	game["sec_type"] = "destroy";				//What type of secondary objective
 
         //retrival settings

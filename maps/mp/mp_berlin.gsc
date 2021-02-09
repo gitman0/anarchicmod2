@@ -25,7 +25,7 @@ main()
 
 	game["russian_soldiertype"] = "conscript";
 	game["russian_soldiervariation"] = "normal";
-	game["german_soldiertype"] = "waffen";
+	game["german_soldiertype"] = "wehrmacht";
 	game["german_soldiervariation"] = "normal";
 
         game["compass_range"] = 2816;				//How far the compass is zoomed in

@@ -41,7 +41,7 @@ main()
 
 	game["british_soldiertype"] = "commando";
 	game["british_soldiervariation"] = "normal";
-	game["german_soldiertype"] = "wehrmacht";
+	game["german_soldiertype"] = "fallschirmjagercamo";
 	game["german_soldiervariation"] = "normal";
 
 	game["layoutimage"] = "mp_italy.dds";

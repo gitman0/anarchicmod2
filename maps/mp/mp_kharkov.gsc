@@ -22,6 +22,11 @@ main()
 	game["allies"] = "russian";
 	game["axis"] = "german";
 
+	game["russian_soldiertype"] = "conscript";
+	game["russian_soldiervariation"] = "normal";
+	game["german_soldiertype"] = "wehrmacht";
+	game["german_soldiervariation"] = "normal";
+
 	game["hud_allies_victory_image"]= "gfx/hud/hud@mp_victory_kharkov_r.dds";
 	game["hud_axis_victory_image"] 	= "gfx/hud/hud@mp_victory_kharkov_g.dds";
 

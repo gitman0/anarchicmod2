@@ -1,21 +1,21 @@
 main()
 {
 	precacheFX();
-	effects = getentarray ("effect","targetname");
-	spawnWorldFX(effects);
+	//effects = getentarray ("effect","targetname");
+	//spawnWorldFX(effects);
 }
 
 precacheFX()
 {
 // Explosions =========================//
-	level._effect["brick"]	                = loadfx ("fx/map_mp/mp_wall_destroy.efx");
+	//level._effect["brick"]	                = loadfx ("fx/map_mp/mp_wall_destroy.efx");
 	level._effect["bell_tower_exp"]		= loadfx ("fx/map_mp/mp_belltower_exp.efx");
 
 // FIRE ===============================//
-        level._effect["fireplace1"]		= loadfx ("fx/map_mp/mp_fireplace_fire.efx");
+        //level._effect["fireplace1"]		= loadfx ("fx/map_mp/mp_fireplace_fire.efx");
 
 // SMOKE ==============================//
-        level._effect["fireplace1_chimney"]	= loadfx ("fx/map_mp/mp_smoke_chimney.efx");
+        //level._effect["fireplace1_chimney"]	= loadfx ("fx/map_mp/mp_smoke_chimney.efx");
 }
 
 spawnWorldFX(effects)

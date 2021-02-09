@@ -22,6 +22,11 @@ main()
 	game["attackers"] = "axis";
 	game["defenders"] = "allies";
 
+	game["american_soldiertype"] = "airborne";
+	game["american_soldiervariation"] = "normal";
+	game["german_soldiertype"] = "fallschirmjagercamo";
+	game["german_soldiervariation"] = "normal";
+
 	game["hud_allies_victory_image"]= "gfx/hud/hud@mp_victory_rhinevalley_us.dds";
 	game["hud_axis_victory_image"] = "gfx/hud/hud@mp_victory_rhinevalley_g.dds";
 

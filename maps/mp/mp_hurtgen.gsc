@@ -11,7 +11,7 @@ main()
 
 	game["american_soldiertype"] = "airborne";
 	game["american_soldiervariation"] = "winter";
-	game["german_soldiertype"] = "wehrmacht";
+	game["german_soldiertype"] = "waffen";
 	game["german_soldiervariation"] = "winter";
 
 	game["attackers"] = "allies";

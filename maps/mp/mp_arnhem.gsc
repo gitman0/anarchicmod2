@@ -18,7 +18,7 @@ main()
 
 	game["british_soldiertype"] = "airborne";
 	game["british_soldiervariation"] = "normal";
-	game["german_soldiertype"] = "wehrmacht";
+	game["german_soldiertype"] = "waffen";
 	game["german_soldiervariation"] = "normal";
 
 	game["dom_layoutimage"] = "mp_arnhem_dom";

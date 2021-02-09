@@ -15,18 +15,6 @@ main()
 	level thread maps\mp\_jeepdrive_gmi::main();
 	level thread maps\mp\_treefall_gmi::main();
 
-	//	we set the different base models here for base assault
-	//	note we COULD use different models for each team 
-
-//	-------------------------------------------	
-	//	BASE ASSAULT SETUP
-//	this is how it should be ( but we don't do it because thats just the defaults ANYWAY 
-//	if(getCvar("scr_bas_basehealth") == "")		// healtg for each base
-//		setCvar("scr_bas_basehealth", "24500");	// 700 tank shell * 35
-//	if(getCvar("scr_bas_damagedhealth") == "")	// health to switch to damage model
-//		setCvar("scr_bas_damagedhealth", getCvarInt("scr_bas_basehealth")/2);
-
-
 	game["bas_allies_rubble"] 	= "xmodel/mp_bunker_foy_rubble";
 	game["bas_allies_complete"] 	= "xmodel/mp_bunker_foy";
 	game["bas_allies_damaged"] 	= "xmodel/mp_bunker_foy_predmg";
@@ -35,7 +23,6 @@ main()
 	game["bas_axis_complete"] 	= "xmodel/mp_bunker_foy";
 	game["bas_axis_damaged"] 	= "xmodel/mp_bunker_foy_predmg";
 	game["bas_axis_destroyed"] 	= "xmodel/mp_bunker_foy_dmg";
-//	-------------------------------------------	
 
         maps\mp\_util_mp_gmi::base_swapper();
         
@@ -62,41 +49,42 @@ main()
 	game["defenders"] = "axis";
 
        	//retrival settings
-	level.obj["Code Book"] = (&"RE_OBJ_CODE_BOOK");
-	level.obj["Field Radio"] = (&"RE_OBJ_FIELD_RADIO");
-	game["re_attackers"] = "allies";
-	game["re_defenders"] = "axis";
-	game["re_attackers_obj_text"] = (&"GMI_MP_RE_OBJ_FOY_ATTACKER");
-	game["re_defenders_obj_text"] = (&"GMI_MP_RE_OBJ_FOY_DEFENDER");
-	game["re_spectator_obj_text"] = (&"GMI_MP_RE_OBJ_FOY_SPECTATOR");
-	game["re_attackers_intro_text"] = (&"GMI_MP_RE_OBJ_FOY_SPAWN_ATTACKER");
-	game["re_defenders_intro_text"] = (&"GMI_MP_RE_OBJ_FOY_SPAWN_DEFENDER");
+	if (getcvar("g_gametype") == "re") {
+		level.obj["Code Book"] = (&"RE_OBJ_CODE_BOOK");
+		level.obj["Field Radio"] = (&"RE_OBJ_FIELD_RADIO");
+		game["re_attackers"] = "allies";
+		game["re_defenders"] = "axis";
+		game["re_attackers_obj_text"] = (&"GMI_MP_RE_OBJ_FOY_ATTACKER");
+		game["re_defenders_obj_text"] = (&"GMI_MP_RE_OBJ_FOY_DEFENDER");
+		game["re_spectator_obj_text"] = (&"GMI_MP_RE_OBJ_FOY_SPECTATOR");
+		game["re_attackers_intro_text"] = (&"GMI_MP_RE_OBJ_FOY_SPAWN_ATTACKER");
+		game["re_defenders_intro_text"] = (&"GMI_MP_RE_OBJ_FOY_SPAWN_DEFENDER");
+	}
 
 	//Flag Setup
 	//There must be a set of the following for each flag in your map.
-	flag1 = getent("flag1","targetname");			// identifies the flag you're setting up
-	flag1.script_timer = 8;					// how many seconds a capture takes with one player
-	flag1.description = (&"GMI_DOM_FLAG1_MP_FOY");
+	if (getcvar("g_gametype") == "dom") {
+		flag1 = getent("flag1","targetname");			// identifies the flag you're setting up
+		flag1.script_timer = 8;					// how many seconds a capture takes with one player
+		flag1.description = (&"GMI_DOM_FLAG1_MP_FOY");
 	
-       	flag2 = getent("flag2","targetname");
-	flag2.script_timer = 12;
-	flag2.description = (&"GMI_DOM_FLAG2_MP_FOY");
+		flag2 = getent("flag2","targetname");
+		flag2.script_timer = 12;
+		flag2.description = (&"GMI_DOM_FLAG2_MP_FOY");
 
-        flag3 = getent("flag3","targetname");
-	flag3.script_timer = 18;
-	flag3.description = (&"GMI_DOM_FLAG3_MP_FOY");
+	        flag3 = getent("flag3","targetname");
+		flag3.script_timer = 18;
+		flag3.description = (&"GMI_DOM_FLAG3_MP_FOY");
 
-        flag4 = getent("flag4","targetname");
-	flag4.script_timer = 12;
-	flag4.description = (&"GMI_DOM_FLAG4_MP_FOY");
+	        flag4 = getent("flag4","targetname");
+		flag4.script_timer = 12;
+		flag4.description = (&"GMI_DOM_FLAG4_MP_FOY");
 
-        flag5 = getent("flag5","targetname");
-	flag5.script_timer = 8;
-	flag5.description = (&"GMI_DOM_FLAG5_MP_FOY");
+	        flag5 = getent("flag5","targetname");
+		flag5.script_timer = 8;
+		flag5.description = (&"GMI_DOM_FLAG5_MP_FOY");
 
-	//wait 0.5;
-	
-	//vehicle_spawner();
+	}
 	maps\mp\mp_foy::move_bases();
 	maps\mp\mp_foy::ctf_balancer();
 	
