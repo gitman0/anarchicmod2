@@ -119,8 +119,9 @@ tank_death()
 	
 		// this will keep the tank from blocking the radius damage
 		self setcontents(0);
-			
-		radiusDamage ( (self.origin[0],self.origin[1],self.origin[2]+25), 512, 200, 0);
+
+		if (level.tank_postdamage == 1)
+			radiusDamage ( (self.origin[0],self.origin[1],self.origin[2]+25), 512, 200, 0);
 	}
 	else
 	{

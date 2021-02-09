@@ -11,7 +11,7 @@ get_allied_spawnpoints () {
 			break;
 
 		case "bas":case "mc_bas":
-			spawn_allied   = getentarray("mp_gmi_bas_allied_spawn", "classname");
+			spawn_allied   = getentarray("mp_gmi_bas_allies_spawn", "classname");
 			break;
 
 		case "actf":case "mc_actf":

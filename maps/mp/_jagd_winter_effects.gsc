@@ -4,7 +4,9 @@ init( precache )
 
 	if (precache)
 	{
-		loadfx("fx/explosions/vehicles/t34_complete_mp.efx");
+		loadfx("fx/explosions/vehicles/t34_mp_n/burn_smoke.efx");
+		loadfx("fx/explosions/vehicles/t34_mp_n/1st_exp_v2.efx");
+		loadfx("fx/explosions/vehicles/t34_mp_n/2nd_exp.efx");
 		loadfx("fx/map_mp/mp_smoke_vehicle_damage.efx");
 		loadfx( self.collision_fx_str );
 	}
@@ -100,27 +102,38 @@ tank_damaged_smoke_stop(smoke_ent)
 
 tank_death()
 {
-	self.deathfx    = loadfx ("fx/explosions/vehicles/t34_complete_mp.efx");
+	self.deathfx    = loadfx ("fx/explosions/vehicles/t34_mp_n/burn_smoke.efx");
+	self.explode1fx = loadfx( "fx/explosions/vehicles/t34_mp_n/1st_exp_v2.efx" );
+	self.explode2fx = loadfx( "fx/explosions/vehicles/t34_mp_n/2nd_exp.efx" );
 	self waittill( "death" );
 	
 	if (!isdefined(self.deepwater))
 	{
 		if (isdefined( self.deathmodel ))
 			self setmodel( self.deathmodel );
-			
-		playfxontag( self.deathfx, self, "tag_origin" );
+
+		// 1st explode
+		playfxontag( self.explode1fx, self, "tag_origin" );
 		earthquake( 0.25, 3, self.origin, 1050 );
 		self thread playLoopSoundOnTag("distantfire");
+		self thread tankPlayFXUntilEvent( self.deathfx, "allow_explode" );
 
 		self waittill( "allow_explode" );
 		println( "recieved allow_explode death");
 	
 		self notify ("stop sound distantfire");
+
+		// 2nd explode
+		playfxontag( self.explode2fx, self, "tag_origin" );
+
+		// wait for effects to finish
+		wait 0.5;
 	
 		// this will keep the tank from blocking the radius damage
 		self setcontents(0);
-			
-		radiusDamage ( (self.origin[0],self.origin[1],self.origin[2]+25), 512, 200, 0);
+
+		if (level.tank_postdamage == 1)
+			radiusDamage ( (self.origin[0],self.origin[1],self.origin[2]+25), 512, 200, 0);
 	}
 	else
 	{
@@ -148,4 +161,13 @@ playLoopSoundOnTag(alias, tag)
 	self waittill ("stop sound " + alias);
 	org stoploopsound (alias);
 	org delete();
+}
+tankPlayFXUntilEvent( fxId, eventStr )
+{
+	// spawn the smoke_ent
+	smoke_ent = PlayLoopedFX( fxId, 1, self.origin );
+
+	self waittill( eventStr );
+
+	smoke_ent delete();
 }
