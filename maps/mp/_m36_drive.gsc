@@ -1,44 +1,56 @@
 
-// NOTE: entity.closespeed can be used as a maxspeed multiplier for each individual vehicle
-
 main()
 {
 
 	level.watereffects 	= loadfx ("fx/water/tug_froth.efx");
 	level.fireydeath = loadfx ("fx/fire/pathfinder_extreme.efx");
 
-	level.jeep_hud_bar = "gfx/hud/hud@health_bar.dds";
 	level.tank_hud_bar = "gfx/hud/hud@health_bar.dds";
-	
+
 	// this is an ugly hack since we can't set an engine field to null
 	level.vehicle_no_owner = spawn("script_origin", (0,0,0) );
-	
-	precacheShader( "gfx/hud/hud@littlejeep.dds" );
+
+	precacheShader( "gfx/hud/hud@littletank.dds" );
 	precacheShader( "gfx/hud/hud@fire_ready_shell.tga" );
 	precacheShader( "gfx/hud/hud@vehiclehealth.dds");
 	precacheShader( "gfx/hud/tankhudhealthbar" );
 	precacheShader( level.tank_hud_bar );
-	precacheShader( level.jeep_hud_bar );
-
-	precacheShader( "gfx/hud/tankhudhealthbar" );
-	precacheShader( "gfx/hud/tankhudback" );
 	precacheShader( "white" );
 	precacheShader( "black" );
 
+	precacheShader( "gfx/hud/tank_reticle25.dds");
+	precacheShader( "gfx/hud/tank_reticle50.dds");
+	precacheShader( "gfx/hud/tank_reticle75.dds");
+	precacheShader( "gfx/hud/tank_reticle100.dds");
+
+	precacheString(&"GMI_MP_CAPTURED_ALLIED_TANK_BROADCAST");
+	precacheString(&"GMI_MP_CAPTURED_AXIS_TANK_BROADCAST");
+	precacheString(&"GMI_MP_TANK_CAPTURING");
+	precacheString(&"GMI_MP_TANK_CAPTURED");
+
 	initVehicleCvars();
+
+	level.tank_capture_time = cvardef("scr_tank_capture_time",15000,0,999999,"int");
+	
+	//level.tank_capture_time = 15000;		// todo: capture time should be a cvar
+
+	// !! TEMP HACK !!
+	// the tanks will eventually have mg42's included in the models
+	// but for now we need to actually map one onto them manually
+	//gunmodel = "xmodel/vehicle_tank_panzeriv_machinegun";
+	//precachemodel(gunmodel);
+
 	restrictPlacedVehicles();
+	
+	// precache everything for the tanks
+	tanks = getentarray("script_vehicle","classname");
 
-	// precache everything for the jeeps
-	jeeps = getentarray("script_vehicle","classname");
-
-	for(i=0;i<jeeps.size;i++)
+	for(i=0;i<tanks.size;i++)
 	{
-		if (	   jeeps[i].vehicletype == "willyjeep_mp" 
-			|| jeeps[i].vehicletype == "horch_mp" 
-			|| jeeps[i].vehicletype == "gaz67b_mp")
+		if (tanks[i].vehicletype == "m36tank_mp")
 		{
 			// precache effects and setup for death model change
-			jeeps[i] maps\mp\_jeepeffects_gmi::init( 1 );
+			tanks[i] maps\mp\_m36_effects::init( 1 );
 		}
 	}
 	
@@ -48,8 +60,7 @@ main()
 	wait(1);
 	
 	// start each tank thinking
-
-	// Get spawns (courtesy of bell)
+	// Get spawns
 	gt = getcvar("g_gametype");
 	switch (gt)
 	{
@@ -117,84 +128,54 @@ main()
 	if(!spawn_axis.size)	spawn_axis   = getentarray("mp_deathmatch_spawn", "classname");
 
 	allied_origin	= spawn_allied[0].origin;
-	axis_origin	= spawn_axis[0].origin;
+	axis_origin		= spawn_axis[0].origin;
 
-	if(level.willyjeep_limit)
+	if(level.m36_limit)
 	{
-		willyjeep_arr = findtanks("willyjeep_mp");
-		if (isdefined(willyjeep_arr) && willyjeep_arr.size)
+		m36_arr = findtanks("m36tank_mp");
+		if (isdefined(m36_arr) && m36_arr.size)
 		{
 			if(isdefined(allied_origin))
-				tankSort = maps\mp\gametypes\_spawnlogic_gmi::GMI_distance_sort(allied_origin, willyjeep_arr);
+				tankSort = maps\mp\gametypes\_spawnlogic_gmi::GMI_distance_sort(allied_origin, m36_arr);
 			else
-				tankSort = willyjeep_arr;
-			limitTank_init(tankSort, level.willyjeep_limit);
-		}
-	}
-	if(level.horch_limit)
-	{
-		horch_arr = findtanks("horch_mp");
-		if (isdefined(horch_arr) && horch_arr.size)
-		{
-			if(isdefined(allied_origin))
-				tankSort = maps\mp\gametypes\_spawnlogic_gmi::GMI_distance_sort(allied_origin, horch_arr);
-			else
-				tankSort = horch_arr;
-			limitTank_init(tankSort, level.horch_limit);
-		}
-	}
-	if(level.gaz67b_limit)
-	{
-		gaz67b_arr = findtanks("gaz67b_mp");
-		if (isdefined(gaz67b_arr) && gaz67b_arr.size)
-		{
-			if(isdefined(allied_origin))
-				tankSort = maps\mp\gametypes\_spawnlogic_gmi::GMI_distance_sort(allied_origin, gaz67b_arr);
-			else
-				tankSort = gaz67b_arr;
-			limitTank_init(tankSort, level.gaz67b_limit);
+				tankSort = m36_arr;
+			limitTank_init(tankSort, level.m36_limit);
 		}
 	}
 }
 
-init(precache)
+init_tank(precache)
 {
 	// give us some health, and manage hud elements
-	self thread init_hud();
+	self thread init_tank_hud();
 
 	self.spawn_origin = self.origin;
 
 	if (!isdefined( self.spawn_count ))
 		self.spawn_count = 1;
-		
+
 	// init the riding_count
 	self.riding_count = 0;
 
 	// start the respawn thread
-	self thread respawn();
+	self thread tank_respawn();
 
 	// setup death model and wait for tank death
-	if (	self.vehicletype == "willyjeep_mp" 
-		||	self.vehicletype == "horch_mp" 
-		||	self.vehicletype == "gaz67b_mp")
+	if (self.vehicletype == "m36_mp")
 	{
-		// precache effects and setup for death model change
-		self maps\mp\_jeepeffects_gmi::init( 0 );
+		self maps\mp\_m36_effects::init( 0 );
 	}
-	self thread maps\mp\_jeepeffects_gmi::damaged_smoke();
-	self thread maps\mp\_jeepeffects_gmi::death();
+	self thread maps\mp\_m36_effects::tank_damaged_smoke();
+	self thread maps\mp\_m36_effects::tank_death();
 
-	// jeeps can be used by anyone
-	self.tank_team = "all";
-	
-	// for team restrictions
-	jeep_set_team();
+	// set the team for capturing
+	self tank_set_team();
 
 	// wait for a player to jump in
 	self thread wait_for_activate();
 }
 
-jeep_set_team()
+tank_set_team()
 {
 	game_type = getcvar("g_gametype");
 	// if this is deathmatch, tdm, or hq then vehicles do not have a team because we
@@ -205,15 +186,13 @@ jeep_set_team()
 		return;
 	}
 
-	if (self.vehicletype == "horch_mp")
+	if (self.vehicletype == "m36tank_mp")
 	{
-		self.team = "axis";
-	} else {
 		self.team = "allies";
 	}
 }
 
-respawn()
+tank_respawn()
 {
 	self waittill("death");
 
@@ -230,7 +209,7 @@ respawn()
 		dupe.tank_num = self.tank_num;
 		
 		dupe thread wait_for_safe_respawn();
-		
+
 		// let us disappear
 		self notify("allow_explode");
 	}
@@ -241,7 +220,7 @@ respawn()
 	}
 }
 
-wait_for_safe_respawn( force_respawn )
+wait_for_safe_respawn(force_respawn)
 {
 	self unlinkfromworld();
 	
@@ -259,9 +238,12 @@ wait_for_safe_respawn( force_respawn )
 	if (!isdefined( level.no_auto_vehicle_respawn ) || !level.no_auto_vehicle_respawn)
 	{
 		// now wait for a safe time to respawn
-		wait_time = getCvarInt("scr_jeep_respawn_wait");
+		wait_time = getCvarInt("scr_tank_respawn_wait");
+		//iprintln("waiting to respawn after " + wait_time + " seconds");
 		wait wait_time;
-	} else if (!isdefined( force_respawn ) || !force_respawn)
+
+	} 
+	else if (!isdefined( force_respawn ) || !force_respawn)
 	{
 		self.allow_respawn = 0;
 	}
@@ -272,21 +254,33 @@ wait_for_safe_respawn( force_respawn )
 	{
 		self clearvehicleposition();
 		
-		if (!isdefined( level.no_auto_vehicle_respawn ) || !level.no_auto_vehicle_respawn)
-		{
+		if (!isdefined( level.no_auto_vehicle_respawn ) || !level.no_auto_vehicle_respawn) {
 			self clearvehicleposition();
-			if (self verifyposition())
+			foy_tank = (0, 0, 0);
+			if (getcvar("mapname") == "mp_foy") {
+				foy1 = (-3788.01, -7339.84, 203.55);
+				foy2 = (4537.22, -4437.55, 32.16);
+				if (distance(self.origin, foy1) < 10)
+					foy_tank = foy1;
+				else if (distance(self.origin, foy2) < 10)
+					foy_tank = foy2;
+			}
+			if ( self verifyposition() || clear_of_others(foy_tank) ) {
+				//iprintln("vehicle position clear, breaking");
 				break;
-		} else
-		{
+			}
+		} 
+		else {
 			if (self.allow_respawn && (self verifyposition())) {
 				self clearvehicleposition();
+				//iprintln("vehicle position NOT clear, breaking");
+				//iprintln(self.origin);
 				break;
 			}
 		}
-		
 		wait 0.2;
 	}
+	//iprintln("while loop done");
 	self.waiting_for_respawn = 0;
 	self.spawn_count++;
 	
@@ -294,9 +288,24 @@ wait_for_safe_respawn( force_respawn )
 	
 	// if we haven't already, starthud elements, etc
 	if (!isdefined( self.riding_count ))
-		self thread init( 0 );
+		self thread init_tank( 0 );
 }
-
+clear_of_others(vec) {
+	
+	if (vec == (0, 0, 0))
+		return false;
+	vehicles = getentarray("script_vehicle", "classname");
+	for (i=0;i<vehicles.size;i++) {
+		if (distance(vec, vehicles[i].origin) < 200 && vehicles[i] != self)
+			return false;
+	}
+	players = getentarray("player", "classname");
+	for (i=0;i<players.size;i++) {
+		if (distance(vec, players[i].origin) < 500)
+			return false;
+	}
+	return true;
+}
 wait_for_activate()
 {
 	self endon("death");
@@ -304,7 +313,7 @@ wait_for_activate()
 	while (1)
 	{
 		self waittill("activated", vehpos, activator);
-
+		
 		self thread delayed_process_activate( vehpos, activator );
 	}
 }
@@ -316,24 +325,30 @@ delayed_process_activate( vehpos, activator )
 	wait 0.1;
 
 	self notify("kill_vehicle_owner");
-	
+
 	// if the tank is set to self-destruct, then abort it if this person is of the correct team
 //	if (isdefined(self.self_destruct_team) && (self.self_destruct_team == activator.pers["team"])) 
 //	{
 		self notify("stop_self_destruct");
 //	}
 
-	self.riding_count++;
+	//self.riding_count++;
 
 	activator.vehpos = vehpos;
 
+	// do tank capturing stuff
+	self thread tank_check_capture( activator );
+	
+	// wait one frame so the capturing stuff can be set up
+	wait 0.1;
+	
 	if (vehpos == 1)
 	{	
 		self.has_been_driven = 1;
 	
 		self.driver = activator;
-		//self thread player_shoot();
-		//self thread player_shoot_alt();
+		self thread player_shoot();
+		self thread player_shoot_alt();
 	}
 	else if (vehpos == 2)
 	{
@@ -346,35 +361,56 @@ delayed_process_activate( vehpos, activator )
 		return;
 		
 	// give them a hud display for the tank
-	self thread hud_activated( activator );
+	self thread tank_hud_activated( activator );
 	
 	// wait for the tank to be deactivated
 	self thread deactivated( activator );
 	
 	// blow us up if the tank dies while we're in it
-	activator thread death_player_damage( self );
+	activator thread tank_death_player_damage( self );
 	
-	// do tank capturing stuff
-	self check_capture( activator );
 }
 
-check_capture( activator )
+tank_check_capture( activator )
 {
-	if (!isdefined( self.tank_team ))
+	// clear the capture variable because it is assumed in a capture mode when a driver gets in
+	if (activator.vehpos == 1)
+		self.capturing = 0;
+	
+	if (!isdefined( self.team ))
 		return;
-
-	if (self.tank_team == "all")
+	
+	// no capturing in dm
+	if ( getcvar("g_gametype") == "dm" )
 		return;
 		
-	if (activator.vehpos == 1 && self.tank_team != activator.pers["team"]) {
+	if (self.team == "all")
+		return;
+		
+	if (activator.vehpos == 1 && self.team != activator.pers["team"]) {
 		// this person needs to capture the tank before it can be driven
-		self thread capture_think( activator );
+		self thread tank_capture_think( activator );
 	}
 }
 
-capture_hud_destroy_thread(tank, driver, capturehud, capturehud2, capturehudtext)
+hud_capture_destroy_player_death(tank, driver)
 {
-	driver waittill("stop_capture_hud");
+	driver endon("abort_hud_capture_destroy_player_death");
+
+	// this an added precaution, if the player dies, make sure the hud gets killed
+	while (driver.health > 0)
+	{
+		driver waittill("damage");
+		if (driver.health <= 0)
+			driver notify("stop_tank_capture_hud");
+	}
+}
+
+tank_capture_hud_destroy_thread(tank, driver, capturehud, capturehud2, capturehudtext)
+{
+	self thread hud_capture_destroy_player_death( tank, driver );
+
+	driver waittill("stop_tank_capture_hud");
 
 	tank.capturing = 0;
 
@@ -384,51 +420,38 @@ capture_hud_destroy_thread(tank, driver, capturehud, capturehud2, capturehudtext
 		return;
 	}
 
+	driver notify("abort_hud_capture_destroy_player_death");
+
 	capturehud destroy();
 	capturehud2 destroy();
 	capturehudtext destroy();
 }
 
-capture_think( activator )
+tank_capture_think( activator )
 {
-	hud_top		= 310;
 	hud_bar_height	= 12;
 
-	activator endon("stop_capture_hud");
+	activator endon("stop_tank_capture_hud");
 
 	self.capturing = 1;
 	
-	capture_time = 10000;		// todo: capture time should be a cvar
 	capture_starttime = gettime();
-	capture_endtime = capture_starttime + capture_time;
+	capture_endtime = capture_starttime + level.tank_capture_time;
 
-	self.capture_hud_maxwidth = 140;
+	self.capture_hud_maxwidth = maps\mp\_util_mp_gmi::get_progressbar_maxwidth();
 	self.capture_hud_width = 1;
 
-	capturehudtext = newClientHudElem( activator );
-	capturehudtext setText(&"GMI_MP_TANK_CAPTURING");
-	capturehudtext.alignX = "center";
-	capturehudtext.alignY = "top";
-	capturehudtext.x = 320;
-	capturehudtext.y = hud_top;
+	capturehudtext = maps\mp\_util_mp_gmi::get_progressbar_text(activator,&"GMI_MP_TANK_CAPTURING");
 		
 	// background
-	capturehud2 = newClientHudElem( activator );
-	capturehud2 setShader("black", self.capture_hud_maxwidth + 2, hud_bar_height + 2);
-	capturehud2.alignX = "left";
-	capturehud2.alignY = "top";
-	capturehud2.x = 320 - self.capture_hud_maxwidth/2 - 1;
-	capturehud2.y = hud_top + 19;
+	capturehud2 =  maps\mp\_util_mp_gmi::get_progressbar_background(activator);
 
 	// foreground
-	capturehud = newClientHudElem( activator );
-	capturehud setShader("white", self.capture_hud_width, hud_bar_height);
-	capturehud.alignX = "left";
-	capturehud.alignY = "top";
-	capturehud.x = 320 - self.capture_hud_maxwidth/2;
-	capturehud.y = hud_top + 20;
+	capturehud = maps\mp\_util_mp_gmi::get_progressbar(activator);
+	maps\mp\_util_mp_gmi::set_progressbar_width(capturehud, self.capture_hud_width);
 
-	level thread capture_hud_destroy_thread( self, activator, capturehud, capturehud2, capturehudtext );
+	level thread tank_capture_hud_destroy_thread( self, activator, capturehud, capturehud2, capturehudtext );
+	level thread tank_capture_sound( activator, self );
 	
 	while (gettime() < capture_endtime)
 	{
@@ -438,13 +461,14 @@ capture_think( activator )
 			return;
 			
 		// update the capture hud
-		self.capture_hud_width = (1.0 * self.capture_hud_maxwidth * (gettime() - capture_starttime)) / capture_time;
+		self.capture_hud_width = (1.0 * self.capture_hud_maxwidth * (gettime() - capture_starttime)) / level.tank_capture_time;
 		if (self.capture_hud_width > self.capture_hud_maxwidth) self.capture_hud_width = self.capture_hud_maxwidth;
-		capturehud setShader("white", self.capture_hud_width, hud_bar_height);
+		if (self.capture_hud_width < 1) self.capture_hud_width = 1;  	// progress bar does not work right if set to 0
+		maps\mp\_util_mp_gmi::set_progressbar_width(capturehud, self.capture_hud_width);
 	}
 
 	// success!
-	self.tank_team = "all";
+	self.team = "all";
 
 	// give us props
 	clientAnnouncement( activator, &"GMI_MP_TANK_CAPTURED" );
@@ -456,18 +480,58 @@ capture_think( activator )
 		player = players[i]; 
 		if (activator.pers["team"] == player.pers["team"])
 		{
-			if (player.pers["team"] == "AXIS")
+			if (player.pers["team"] == "axis")
 				player iprintln(&"GMI_MP_CAPTURED_ALLIED_TANK_BROADCAST", activator);
 			else
 				player iprintln(&"GMI_MP_CAPTURED_AXIS_TANK_BROADCAST", activator);
 		}
 	}
       	
-     	self notify("stop_self_destruct");
-	activator notify("stop_capture_hud");
+      	self notify("stop_self_destruct");
+	activator notify("stop_tank_capture_hud");
 }
 
-death_player_damage( tank )
+tank_capture_sound( activator, tank )
+{
+	activator endon("stop_tank_capture_hud");
+	sound_object = spawn ("script_model",tank.origin);
+	sound_object.started = false;
+	
+	// this prevents the entity from being solid and blocking the radius damage
+	sound_object SetContents(0);
+	
+	thread tank_capture_sound_cleanup( activator, sound_object );
+	
+	// the capture time is 10 secs, the sound is 7 secs, so we will start the sound
+	// 3 secs in to the capture to get the sound to roll right into the regular tank sound
+	// if either the capture time or the sound length changes then this needs to be updated
+//	wait_time = (level.tank_capture_time * 0.001) - 7.5;
+//	if (wait_time < 0)
+//		wait_time = 0;
+//		
+//	println("waiting cap sound sound" + wait_time);
+//	wait(wait_time);
+	
+	// even though this sound only plays once we need to play it as a looping sound so
+	// we can stop it if the player jumps out.  You can only stop looping sounds.
+	sound_object playloopsound ("tank_hotwire");
+	sound_object.started = true;
+}
+
+tank_capture_sound_cleanup( activator, sound_object )
+{
+	activator waittill("stop_tank_capture_hud");
+	
+	if ( sound_object.started )
+		sound_object stoploopsound();
+	
+	// let the sound stop
+	wait(0.01);
+	
+	sound_object delete();
+}
+
+tank_death_player_damage( tank )
 {
 	self endon ("deactivated_player");
 	
@@ -520,7 +584,7 @@ deactivated( activator )
 		// send this so they can end player-oriented threads
 		if ( isValidPlayer(activator) )
 			activator thread send_delayed_player_deactivate();
-		
+
 		self thread process_deactivate(deactivator);
 		break;
 	}
@@ -528,50 +592,45 @@ deactivated( activator )
 	
 process_deactivate(deactivator)
 {
-	if (isdefined(deactivator) && deactivator.vehpos == 1) {	// driver
+	if (isdefined(deactivator) && deactivator.vehpos == 1)	// driver
 		self.driver = undefined;
-	}
-	if (isdefined(deactivator) && deactivator.vehpos == 2) {	// gunner
+	if (isdefined(deactivator) && deactivator.vehpos == 2)	// gunner
 		self.gunner = undefined;
-	}
 
-	if ( isValidPlayer( deactivator ) )
-	{
-		deactivator notify ("stop_capture_hud");
-		deactivator notify ("stop_hud");
+	if (isValidPlayer(deactivator)) {
+		deactivator notify ("stop_tank_capture_hud");
+		deactivator notify ("stop_tank_hud");
 		self.self_destruct_team = deactivator.pers["team"];
 	}
-	else
-	{
-		self.self_destruct_team = "all";
-	}
+	else self.self_destruct_team = "all";
 
-	if (self.riding_count == 0 && isdefined(self.has_been_driven) && (self.tank_team == "all" || self.tank_team == self.self_destruct_team)) 
+	if (self.riding_count == 0 && isdefined(self.has_been_driven) && (self.team == "all" || self.team == self.self_destruct_team)) 
 	{
-		if (getCvarInt("scr_selfDestructJeepTime") == 0)
-			setCvar("scr_selfDestructJeepTime", "90");
+		if (getCvarInt("scr_selfDestructTankTime") == 0)
+			setCvar("scr_selfDestructTankTime", "180");
 			
-		if (getCvarInt("scr_selfDestructJeepTime") > 0)
+		if (getCvarInt("scr_selfDestructTankTime") >= 0)
 		{
 			// now start a timer to self destruct
 			self endon("stop_self_destruct");
 			
 			// wait and then if not being used blow up
-			wait(getCvarInt("scr_selfDestructJeepTime"));
+			if (getCvarInt("scr_selfDestructTankTime") > 0)
+				wait(getCvarInt("scr_selfDestructTankTime"));
+			else
+				wait(180);
 
-			// only blow up if it is empty
 			self dodamage( 10000, self.origin+(0,0,1), self, self, "MOD_EXPLOSIVE" );
 		}
 	}
 }
 
-init_hud()
+init_tank_hud()
 {
 	self.healthbuffer = 2000;
 	self.basehealth = 900;
 	self.health = self.basehealth + self.healthbuffer;
 	self.currenthealth = self.health;
-
 	self.hud_width = 128;
 	self.hud_maxwidth = self.hud_width;
 	basewidth = self.hud_width;
@@ -579,20 +638,21 @@ init_hud()
 
 	while(self.hud_width > minwidth)
 	{
-		self waittill ("damage",ammount,attacker,dir, point, mod,inflictor);
+		self waittill ("damage",ammount,attacker,dir,point,mod,inflictor);
 
+		//println("tank " + self.tank_num + " taking damage " + ammount );
 		// if we are in ceasefire mode vehicles can not be damaged
 		if(level.ceasefire)
 		{
 			self.health = self.health + ammount;
 			continue;
 		}
-
+		
 		if ( !isdefined(inflictor) )
 			inflictor = attacker;
 			
 		owner = self getvehicleowner();
-
+		
 		// no damage if friendly fire
 		if(isdefined(attacker) && isPlayer(attacker) && isdefined(owner) 
 			&& (self != inflictor) && (owner.pers["team"] == attacker.pers["team"])
@@ -602,37 +662,54 @@ init_hud()
 			continue;
 		}
 		
-		self.tank_attacker = attacker;
-
+		// pass on some of the damage to the driver (muahhh muahhhh muahh muahhh ahhh)
+//		if ( isdefined(self.driver) && isvalidplayer(self.driver) )
+//		{
+//			println("passing damage to driver " + ammount + " "+ ammount * 0.045 );
+//			if (isDefined( attacker ) && isValidPlayer( attacker ))
+//			{
+//				self.driver dodamage( ammount * 0.045, point, attacker, inflictor, mod );
+//			}
+//			else
+//			{
+//				// really should never get here
+//				self.driver dodamage( ammount * 0.045, point, self, self, mod );
+//			}
+//		}
+		
 		self.currenthealth = self.health;
-
 		if(!(self.health < self.healthbuffer))
+		{
 			self.hud_width = ((self.health - self.healthbuffer)*basewidth)/self.basehealth;
+		}
 		else
+		{
 			self.hud_width = 0;
+		}
 
-		self notify("hud_update");
+		self notify("tank_hud_update");
 	}
 
 	// save who the last attacker was so we can give them credit for the driverkill
 	self.last_attacker = attacker;
 	self.last_inflictor = inflictor;	
-		
+	
+	// kill the tank
 	if ( mod != "MOD_WATER")
 	{
-		explosion_origin = (self.origin[0],self.origin[1],self.origin[2]+25);
 		// big explosion
 		if (isDefined( attacker ))
 		{
-			self DoDamage( 10000, explosion_origin,  attacker, inflictor, mod );
-			radiusDamage ( explosion_origin, 300, 80, 10, attacker, inflictor);
+			self DoDamage( 10000, (self.origin[0],self.origin[1],self.origin[2]+25),  attacker, inflictor, mod );
+			radiusDamage ( (self.origin[0],self.origin[1],self.origin[2]+180), 300,  150, 10, attacker, inflictor);
 		}
 		else
 		{
-			self DoDamagemod( 10000, explosion_origin, mod );
-			radiusDamage ( explosion_origin, 300, 80, 10);
+			self DoDamagemod( 10000, (self.origin[0],self.origin[1],self.origin[2]+25), mod );
+			radiusDamage ( (self.origin[0],self.origin[1],self.origin[2]+180), 300, 150, 10, self);
 		}
 	}
+	
 }
 
 hud_destroy_player_death(tank, driver)
@@ -644,17 +721,18 @@ hud_destroy_player_death(tank, driver)
 	{
 		driver waittill("damage");
 		if (driver.health <= 0)
-			driver notify("stop_hud");
+			driver notify("vehicle_deactivated", tank);
 	}
 }
 
-hud_destroy_thread(tank, driver, tankhud, tankhud2, overheat,littlejeep)
+tank_hud_destroy_thread(tank, driver, tankhud, tankhud2, overheat, littletank, fireicon)
 {
 	level thread hud_destroy_player_death( tank, driver );
+	
+	driver waittill("vehicle_deactivated",tank);
+//	driver waittill("stop_tank_hud");
 
-	driver waittill("stop_hud");
-
-	if (!isValidPlayer( driver ))
+	if (!isvalidplayer( driver ))
 	{
 		// already disconnected, hudelem's must have been destroyed
 		return;
@@ -662,102 +740,131 @@ hud_destroy_thread(tank, driver, tankhud, tankhud2, overheat,littlejeep)
 
 	driver notify("abort_hud_destroy_player_death");
 
-	if (isdefined(littlejeep))
-		littlejeep destroy();
+	littletank destroy();
 
-	if (isdefined( tankhud ))
-		tankhud destroy();
+	tankhud destroy();
 	tankhud2 destroy();
-	if (isdefined( overheat ))
-		overheat destroy();
+	overheat destroy();
+	
+	if (isdefined(fireicon))
+	{
+		if (isdefined( fireicon[0] )) fireicon[0] destroy();
+		if (isdefined( fireicon[1] )) fireicon[1] destroy();
+		if (isdefined( fireicon[2] )) fireicon[2] destroy();
+		if (isdefined( fireicon[3] )) fireicon[3] destroy();
+	}
 }
 
-hud_activated(activator)
+tank_hud_activated(activator)
 {
-	littlejeep = newClientHudElem(activator);
-	littlejeep setShader("gfx/hud/hud@littlejeep.dds", 12, 10);
-	littlejeep.alignX = "left";
-	littlejeep.alignY = "top";
-	littlejeep.x = 488;
-	littlejeep.y = 445;
-
-	// if this is the gunner give them the overheat bar as well
-	if (activator.vehpos == 1 || activator.vehpos == 2)
-	{
-		overheat = newClientHudElem( activator );
-		overheat setShader(level.jeep_hud_bar, 128, 4);
-		overheat.alignX = "left";
-		overheat.alignY = "top";
-		overheat.x = 488+14;
-		overheat.y = 437;
-	}
-
 	// create the hud elements
+	littletank = newClientHudElem(activator);
+	littletank setShader("gfx/hud/hud@littletank.dds", 12, 10);
+	littletank.alignX = "left";
+	littletank.alignY = "top";
+	littletank.x = 488;
+	littletank.y = 445;
+
+	overheat = newClientHudElem( activator );
+	overheat setShader(level.tank_hud_bar, 128, 4);
+	overheat.alignX = "left";
+	overheat.alignY = "top";
+	overheat.x = 488+14;
+	overheat.y = 437;
 
 	tankhud = newClientHudElem( activator );
 	tankhud.color = (1.0,0.0,0.0);
+
 	tankhud setShader(level.tank_hud_bar, self.hud_width,8);
 	tankhud.alignX = "left";
 	tankhud.alignY = "top";
 	tankhud.x = 488+13;
 	tankhud.y = 446;
-
+	
 	tankhud2 = newClientHudElem( activator );
 	tankhud2 setShader("gfx/hud/hud@vehiclehealth.dds", 128, 32);
 	tankhud2.alignX = "left";
 	tankhud2.alignY = "top";
 	tankhud2.x = 488+13;
 	tankhud2.y = 452-16;
+	
+	if (isdefined(self.driver) && activator == self.driver)
+	{	
+		fireicon[0] = newClientHudElem( activator );
+		fireicon[0].alignX = "center";
+		fireicon[0].alignY = "middle";
+		fireicon[0].x = 320;
+		fireicon[0].y = 240;
+		fireicon[0] setShader("gfx/hud/tank_reticle25.dds", 64, 64);
+
+		fireicon[1] = newClientHudElem( activator );
+		fireicon[1].alignX = "center";
+		fireicon[1].alignY = "middle";
+		fireicon[1].x = 320;
+		fireicon[1].y = 240;
+		fireicon[1] setShader("gfx/hud/tank_reticle50.dds", 64, 64);
+
+		fireicon[2] = newClientHudElem( activator );
+		fireicon[2].alignX = "center";
+		fireicon[2].alignY = "middle";
+		fireicon[2].x = 320;
+		fireicon[2].y = 240;
+		fireicon[2] setShader("gfx/hud/tank_reticle75.dds", 64, 64);
+
+		fireicon[3] = newClientHudElem( activator );
+		fireicon[3].alignX = "center";
+		fireicon[3].alignY = "middle";
+		fireicon[3].x = 320;
+		fireicon[3].y = 240;
+		fireicon[3] setShader("gfx/hud/tank_reticle100.dds", 64, 64);
+
+		self thread tank_hud_fireicon_run( activator, fireicon);
+		level thread tank_hud_destroy_thread( self, activator, tankhud, tankhud2, overheat, littletank, fireicon );
+		self thread tank_hud_overheat_run( activator,overheat, true);
+	}
+	else
+	{
+		level thread tank_hud_destroy_thread( self, activator, tankhud, tankhud2, overheat, littletank );
+		self thread tank_hud_overheat_run( activator,overheat, false );
+	}
 		
 	// while the player is using the tank, keep updating the hud	
-	self thread hud_run( activator, tankhud );
-	
-	// if this is the gunner give them the overheat bar as well
-	if (activator.vehpos == 1 || activator.vehpos == 2)
-	{
-		self thread hud_overheat_run(activator, overheat);
-		level thread hud_destroy_thread( self, activator, tankhud, tankhud2, overheat , littlejeep );
-	}
-	else 
-	{
-		level thread hud_destroy_thread( self, activator, tankhud, tankhud2, undefined, littlejeep );
-	}
-	
-
+	self thread tank_hud_run( activator, tankhud );
 }
 
-hud_run(driver, tankhud)
+tank_hud_run(driver, tankhud)
 {
 	self endon("death");
-	driver endon ("death");
-	driver endon("stop_hud");
+	driver endon("death");
+	driver endon("stop_tank_hud");
 	
 	minwidth = 0;
 
 	while(1)
 	{
-		self waittill("hud_update");
+		self waittill("tank_hud_update");
 
 		if ( !isAlive(self) || !isDefined(tankhud) )
 			continue;
-
+			
 		if(self.hud_width > minwidth)
 			tankhud setShader(level.tank_hud_bar, self.hud_width,8);
 		else
 		{
 			tankhud setShader(level.tank_hud_bar, minwidth,8);
 			break;
-		}			
+		}
 	}
 }
 
-hud_overheat_run(activator, overheat)
+tank_hud_overheat_run(activator, overheat, is_driver)
 {
 	self endon("death");
 	activator endon("death");
 	activator endon("stop_tank_hud");
 	
 	minheight = 0;
+
 	max_width = 126;
 	
 	while(1)
@@ -766,8 +873,8 @@ hud_overheat_run(activator, overheat)
 		if ( !isAlive(self) || !isDefined(overheat) )
 			continue;
 		
-		if ( activator.vehpos == 1)
-		{
+		if (is_driver)
+		{	
 			heat = self getaltheat();
 			overheating = self getaltoverheating();
 		}
@@ -776,7 +883,6 @@ hud_overheat_run(activator, overheat)
 			heat = self getgunnerheat();
 			overheating = self getgunneroverheating();
 		}
-		
 		if ( overheating )
 		{
 			overheat.color = ( 1.0, 0.0, 0.0);
@@ -785,7 +891,7 @@ hud_overheat_run(activator, overheat)
 		{
 			overheat.color = ( 1.0, 1.0-heat,1.0-heat);
 		}
-	
+		
 		hud_width = (1.0 - heat) * max_width;
 		
 		if ( hud_width < 1 )
@@ -795,22 +901,56 @@ hud_overheat_run(activator, overheat)
 	}
 }
 
+fadeoff()
+{
+	while(self.alpha > 0.0)
+	{
+		self.alpha = self.alpha - 0.2;
+		wait(0.05);
+	}
+	self.threaded = 0;
+}
 
-hud_fireicon_run( driver, fireicon )
+
+tank_hud_fireicon_run( driver,fireicon )
 {
 	self endon ("death");
 	driver endon ("death");
-	driver endon ("stop_hud");
+	driver endon ("stop_tank_hud");
+
+	for (q=0;q<4;q++)
+	{
+		fireicon[q].threaded = 0;
+		fireicon[q].alpha = 0;
+	}
 
 	while (1)
 	{
-		fireicon.alpha = 1;
 		self waittill ("turret_fire");
-		fireicon.alpha = 0;
+
+		if(level.ceasefire == 2)
+			continue;
+
+		for (q=0;q<4;q++)
+			fireicon[q].alpha = 1.0;
+
 		wait .5;
 		self playsound ("tank_reload");
+	
 		while (self isTurretReady() != true)
-			wait .2;
+		{
+			val = self get_fire_time() / 500;
+			if (val<=3)
+			{
+//				self.fireicon[val].alpha = 0;
+				if (fireicon[val].threaded == 0)
+				{
+					fireicon[val].threaded = 1;
+					fireicon[val] thread fadeoff();
+				}
+			}
+			wait .25;
+		}
 	}
 }
 
@@ -847,7 +987,7 @@ fire()
 
 	if(level.ceasefire == 2)
 		return;
-	
+
 	// fire the turret
 	self FireTurret();
 }
@@ -899,73 +1039,37 @@ fire_gunner()
 
 	// fire the turret
 	self FireGunner();
+	
+	wait (0.01);
 }
 
 initVehicleCvars()
 {
-	if(getCvar("scr_jeep_respawn_wait") == "")
-		setCvar("scr_jeep_respawn_wait", "5");
+	level.allow_m36 = getCvar("scr_allow_m36");
+	if(level.allow_m36 == "")
+		level.allow_m36 = "1";
+	setCvar("scr_allow_m36", level.allow_m36);
+	setCvar("ui_allow_m36", level.allow_m36);
+	makeCvarServerInfo("ui_allow_m36", "1");
 
-	if(getCvar("scr_jeep_spawn_limit") == "")
-		setCvar("scr_jeep_spawn_limit", "0");
 
-	level.allow_jeeps = getCvar("scr_allow_jeeps");
-	if(level.allow_jeeps == "")
-		level.allow_jeeps = "1";
-	setCvar("scr_allow_jeeps", level.allow_jeeps);
-	setCvar("ui_allow_jeeps", level.allow_jeeps);
-	makeCvarServerInfo("ui_allow_jeeps", "1");
-
-	level.allow_willyjeep = getCvar("scr_allow_willyjeep");
-	if(level.allow_willyjeep == "")
-		level.allow_willyjeep = "1";
-	setCvar("scr_allow_willyjeep", level.allow_willyjeep);
-	setCvar("ui_allow_willyjeep", level.allow_willyjeep);
-	makeCvarServerInfo("ui_allow_willyjeep", "1");
-
-	level.allow_gaz67b = getCvar("scr_allow_gaz67b");
-	if(level.allow_gaz67b == "")
-		level.allow_gaz67b = "1";
-	setCvar("scr_allow_gaz67b", level.allow_gaz67b);
-	setCvar("ui_allow_gaz67b", level.allow_gaz67b);
-	makeCvarServerInfo("ui_allow_gaz67b", "1");
-
-	level.allow_horch = getCvar("scr_allow_horch");
-	if(level.allow_horch == "")
-		level.allow_horch = "1";
-	setCvar("scr_allow_horch", level.allow_horch);
-	setCvar("ui_allow_horch", level.allow_horch);
-	makeCvarServerInfo("ui_allow_horch", "1");
-
-	level.willyjeep_limit	= cvardef("scr_allow_willyjeep_limit", 99, 0, 99, "int");
-	level.horch_limit	= cvardef("scr_allow_horch_limit", 99, 0, 99, "int");
-	level.gaz67b_limit	= cvardef("scr_allow_gaz67b_limit", 99, 0, 99, "int");
+	level.m36_limit		= cvardef("scr_allow_m36_limit", 99, 0, 99, "int");
 	level.tank_postdamage	= cvardef("scr_vehicle_postdamage", 1, 0, 1, "int");
 }
 
 restrictPlacedVehicles()
 {
-	if (level.willyjeep_limit == 0)
-		deletePlacedEntity("willyjeep_mp");
-	if (level.horch_limit == 0)
-		deletePlacedEntity("horch_mp");
-	if (level.gaz67b_limit == 0)
-		deletePlacedEntity("gaz67b_mp");
+	if (level.m36_limit == 0)
+		deletePlacedEntity("m36_mp");
 
-	if(level.allow_jeeps == "0")
+	if(level.allow_tanks == "0")
 	{
-		deletePlacedEntity("willyjeep_mp");
-		deletePlacedEntity("gaz67b_mp");
-		deletePlacedEntity("horch_mp");
+		deletePlacedEntity("m36_mp");
 		return;
 	}
 
-	if(level.allow_willyjeep != "1")
-		deletePlacedEntity("willyjeep_mp");
-	if(level.allow_gaz67b != "1")
-		deletePlacedEntity("gaz67b_mp");
-	if(level.allow_horch != "1")
-		deletePlacedEntity("horch_mp");
+	if(level.allow_m36 != "1")
+		deletePlacedEntity("m36_mp");
 }
 
 deletePlacedEntity(vehicletype)
@@ -977,7 +1081,7 @@ deletePlacedEntity(vehicletype)
 		if (tanks[i].vehicletype == vehicletype)
 		{
 			// precache effects and setup for death model change
-			println("DELETED: ", tanks[i].vehicletype);
+//			println("DELETED: ", tanks[i].vehicletype);
 			tanks[i] delete();
 		}
 	}
@@ -1011,6 +1115,12 @@ spawnVehicle( vehicletype, range_origin, range_limit, spawner_origin )
 
 	tanks = getentarray("script_vehicle","classname");
 	vehspawns = getentarray("script_vehicle_spawn","targetname");
+
+	if (!isdefined( tanks ) || tanks.size >= 64)
+	{
+		level.spawnVehicleError = &"GMI_BOP_VEHICLE_LIMIT_REACHED	";
+		return undefined;
+	}
 	
 	valid_count = 0;
 	level.spawnVehicleError = &"";
@@ -1130,11 +1240,11 @@ spawnVehicle( vehicletype, range_origin, range_limit, spawner_origin )
 
 	newtank unlinkfromworld();
 	
-	wait 0.2;	// let it drop to the ground
+	wait 0.2;
 
 	newtank clearvehicleposition();
 	
-	newtank thread init( 0 );
+	newtank thread init_tank( 0 );
 
 	newtank linkintoworld();
 	
@@ -1174,19 +1284,55 @@ setVehicleOwner( owner, timeout )
 		self thread clearVehicleOwner();
 	}
 }
+
+addVehicleSpawn( origin, angles )
+{
+	vehspawn = spawn( "script_origin", origin + (0,0,16) );
+	vehspawn.angles = angles;
+	vehspawn.targetname = "script_vehicle_spawn";
+	vehspawn.spawn_origin = origin;
+}
+
+vehicleTeamCount( team )
+{
+	tanks = getentarray("script_vehicle","classname");
+
+	count = 0;
+	for(i=0;i<tanks.size;i++)
+	{
+		if (!isdefined( tanks[i].team ))
+		{
+			if (	tanks[i].vehicletype == "willyjeep_mp" 
+				||	tanks[i].vehicletype == "horch_mp" 
+				||	tanks[i].vehicletype == "gaz67b_mp")
+			{
+				tanks[i] maps\mp\_jeepdrive_gmi::jeep_set_team();
+			}
+			else
+			{
+				tanks[i] tank_set_team();
+			}
+		}
+		if (isdefined( tanks[i].team ) && tanks[i].team == team)
+			count++;
+	}
+	
+	return count;
+}
 limitTank_init(array, limit)
 {
 	for (i = 0; i < array.size; i++)
 	{
 		if(i<limit)
 		{
-			array[i] thread init(1);
+			array[i] thread init_tank(1);
 			array[i].tank_num = i;
 		}
 		else
 			array[i] delete();
 	}
 }
+
 findtanks(tanktype)
 {
 	tanks = getentarray("script_vehicle","classname");
@@ -1196,6 +1342,7 @@ findtanks(tanktype)
 			tankarr[tankarr.size] = tanks[i];
 	return tankarr;
 }
+
 cvardef(varname, vardefault, min, max, type)
 {
 	mapname = getcvar("mapname");		// "mp_dawnville", "mp_rocket", etc.

@@ -49,7 +49,7 @@ minefield_kill_vehicle(trigger)
 			origin = self getorigin();
 			org = self.origin;
 			range = 25;
-			maxdamage = 4000;
+			maxdamage = 5000;
 			mindamage = 400;
 			
 			playfx ( level._effect["mine_explosion"], origin);
@@ -58,7 +58,7 @@ minefield_kill_vehicle(trigger)
 		}
 	}
 	
-	self waittill("allow explode");
+	self waittill("allow_explode");
 	self.in_mines = undefined;
 }
 

@@ -39,13 +39,18 @@ init( precache )
 	else
 	if (self.vehicletype == "panzeriv_mp")
 	{
-		if (self.model == "xmodel/mp_vehicle_panzeriv")
+		self setModel(maps\mp\gametypes\_anarchic::getpanzermodel());
+		//self.model = maps\mp\gametypes\_anarchic::getpanzermodel();
+		self.deathmodel = "xmodel/mp_vehicle_panzeriv_damaged";
+
+		/*if (self.model == "xmodel/mp_vehicle_panzeriv")
 			self.deathmodel = "xmodel/mp_vehicle_panzeriv_damaged";
 		else if (self.model == "xmodel/mp_vehicle_panzeriv_snow")
 			self.deathmodel = "xmodel/mp_vehicle_panzeriv_damaged";
 		else
 			self.deathmodel = "xmodel/mp_vehicle_panzeriv_damaged";
-		
+		*/
+
 		if (precache)
 			precachevehicle("panzeriv_mp");
 	}
@@ -54,7 +59,8 @@ init( precache )
 	{
 		if (self.model == "xmodel/v_ge_lnd_elefant")
 			self.deathmodel = "xmodel/v_ge_lnd_elefant(d)";
-		
+		else if (self.model == "xmodel/mp_vehicle_elefant_snow")
+			self.deathmodel = "xmodel/mp_vehicle_elefant_snow_d";
 		if (precache)
 			precachevehicle("elefant_mp");
 	}
@@ -167,8 +173,8 @@ tank_death()
 	
 	if (!isdefined(self.deepwater))
 	{
-		//if (isdefined( self.deathmodel ))
-		//	self setmodel( self.deathmodel );
+		if (isdefined( self.deathmodel ))
+			self setmodel( self.deathmodel );
 
 		// 1st explode			
 		playfxontag( self.explode1fx, self, "tag_origin" );
@@ -189,8 +195,9 @@ tank_death()
 	
 		// this will keep the tank from blocking the radius damage
 		self setcontents(0);
-			
-		radiusDamage ( (self.origin[0],self.origin[1],self.origin[2]+25), 300, 150, 10, self);
+
+		if (level.tank_postdamage == 1)
+			radiusDamage ( (self.origin[0],self.origin[1],self.origin[2]+25), 300, 150, 10, self);
 	}
 	else
 	{

@@ -44,6 +44,7 @@ self is the player that is disconnecting.
 ================*/
 CodeCallback_PlayerDisconnect()
 {
+	self notify("disconnect");
 	[[level.callbackPlayerDisconnect]]();
 }
 
@@ -95,7 +96,6 @@ SetDefaultCallbacks()
 	level.default_CallbackPlayerDamage = level.callbackPlayerDamage;
 	level.default_CallbackPlayerKilled = level.callbackPlayerKilled;
 }
-
 /*================
 Called when a gametype is not supported.
 ================*/

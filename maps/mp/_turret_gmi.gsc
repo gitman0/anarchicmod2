@@ -122,8 +122,9 @@ turret_hud_overheat_run(activator, overheat)
 turret_dismount()
 {
 	self waittill("deactivated");
-	
-	self.gunner notify("stop_turret_hud");
+
+	if (isalive(self.gunner))
+		self.gunner notify("stop_turret_hud");
 	
 	// now restart the thinking for the next user
 	self thread turret_think();

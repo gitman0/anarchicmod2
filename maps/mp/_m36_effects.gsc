@@ -13,41 +13,14 @@ init( precache )
 		loadfx( self.collision_fx_str );
 	}
 	
-	if (self.vehicletype == "willyjeep_MP" || self.vehicletype == "willyjeep_mp")
+	if (self.vehicletype == "m36tank_mp")
 	{
-		self setModel(maps\mp\gametypes\_anarchic::getwillymodel(self.model));
-		
-		if (self.model == "xmodel/v_us_lnd_willysjeep")
-			self.deathmodel = "xmodel/v_us_lnd_willysjeep_d";						
-		else if (self.model == "xmodel/mp_v_us_lnd_willysjeep_snow")
-			self.deathmodel = "xmodel/v_us_lnd_willysjeep_snow_d";
+		if(self.model == "xmodel/mp_vehicle_m36_snow")
+			self.deathmodel = "xmodel/mp_vehicle_m36_snow_d";
 		
 		if (precache)
-			precachevehicle("willyjeep_mp");
+			precachevehicle("m36tank_mp");
 	}
-	else if (self.vehicletype == "horch_mp" )
-	{
-		self setModel(maps\mp\gametypes\_anarchic::gethorchmodel(self.model));
-
-		if (self.model == "xmodel/mp_vehicle_horch1a")
-			self.deathmodel = "xmodel/mp_vehicle_horch1a_damaged";
-		else
-			self.deathmodel = "xmodel/mp_vehicle_horch1a_damaged";
-		
-		if (precache)
-			precachevehicle("horch_mp");
-	}
-	else if (self.vehicletype == "gaz67b_mp" )
-	{
-		if (self.model == "xmodel/mp_vehicle_gaz67b")
-			self.deathmodel = "xmodel/mp_vehicle_gaz67b_damaged";
-		else
-			self.deathmodel = "xmodel/mp_vehicle_gaz67b_damaged";
-		
-		if (precache)
-			precachevehicle("gaz67b_mp");
-	}
-	
 	if (!isdefined( self.deathmodel ))
 	{
 		println("vehicle unknown, check that vehicle type and model are both lowercase");
@@ -60,10 +33,10 @@ init( precache )
 	}
 
 	// start the collision thinker
-	self thread collision_thread();
+	self thread tank_collision_thread();
 }
 
-collision_thread()
+tank_collision_thread()
 {
 	self endon("death");
 	
@@ -79,7 +52,7 @@ collision_thread()
 	
 }
 
-damaged_smoke()
+tank_damaged_smoke()
 {
 	self endon ("death");
 	
@@ -106,7 +79,7 @@ damaged_smoke()
 						// spawn the smoke_ent
 						smoke_ent = PlayLoopedFX( smokefx, 0.3, self.origin, 2048 );
 						// kill it once we're dead
-						self thread damaged_smoke_stop( smoke_ent );
+						self thread tank_damaged_smoke_stop( smoke_ent );
 					}
 					else
 					{
@@ -121,14 +94,14 @@ damaged_smoke()
 	}
 }
 
-damaged_smoke_stop(smoke_ent)
+tank_damaged_smoke_stop(smoke_ent)
 {
 	self waittill("death");
 	
 	smoke_ent delete();
 }
 
-jeepPlayFXUntilEvent( fxId, eventStr )
+tankPlayFXUntilEvent( fxId, eventStr )
 {
 	// spawn the smoke_ent
 	smoke_ent = PlayLoopedFX( fxId, 1, self.origin );
@@ -138,7 +111,7 @@ jeepPlayFXUntilEvent( fxId, eventStr )
 	smoke_ent delete();
 }
 
-death()
+tank_death()
 {
 	self.deathfx    = loadfx ("fx/explosions/vehicles/t34_mp_n/burn_smoke.efx");
 	self.explode1fx = loadfx( "fx/explosions/vehicles/t34_mp_n/1st_exp_v2.efx" );
@@ -149,12 +122,12 @@ death()
 	{
 		if (isdefined( self.deathmodel ))
 			self setmodel( self.deathmodel );
-			
+
 		// 1st explode			
-		playfxontag( self.explode1fx, self, "tag_origin" );		
+		playfxontag( self.explode1fx, self, "tag_origin" );
 		earthquake( 0.25, 3, self.origin, 1050 );
 		self thread playLoopSoundOnTag("distantfire");
-		self thread jeepPlayFXUntilEvent( self.deathfx, "allow_explode" );
+		self thread tankPlayFXUntilEvent( self.deathfx, "allow_explode" );
 
 		self waittill( "allow_explode" );
 		println( "recieved allow_explode death");
@@ -167,10 +140,11 @@ death()
 		// wait for effects to finish
 		wait 0.5;
 	
-		// this will keep the jeep from blocking the radius damage
+		// this will keep the tank from blocking the radius damage
 		self setcontents(0);
+
 		if (level.tank_postdamage == 1)
-			radiusDamage ( (self.origin[0],self.origin[1],self.origin[2]+25), 512, 100, 0);
+			radiusDamage ( (self.origin[0],self.origin[1],self.origin[2]+25), 300, 150, 10, self);
 	}
 	else
 	{
@@ -194,6 +168,7 @@ playLoopSoundOnTag(alias, tag)
 		org linkto (self);
 	}
 	org playloopsound (alias);
+//	println ("playing loop sound ", alias," on entity at origin ", self.origin, " at ORIGIN ", org.origin);
 	self waittill ("stop sound " + alias);
 	org stoploopsound (alias);
 	org delete();

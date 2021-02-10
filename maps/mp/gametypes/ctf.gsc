@@ -366,6 +366,8 @@ main() // Starts when map is loaded.
 	//
 	if(getCvar("scr_debug_ctf") == "")
 		setCvar("scr_debug_ctf", "0"); 
+
+	thread maps\mp\gametypes\_anarchic::main();
 }
 
 // ----------------------------------------------------------------------------------
@@ -675,6 +677,8 @@ Callback_StartGameType() // Setup the game.
 	thread maps\mp\gametypes\_teams::updateGlobalCvars();
 	thread maps\mp\gametypes\_teams::updateWeaponCvars();
 
+	thread maps\mp\gametypes\_anarchic::Callback_StartGameType();
+
 	game["gamestarted"] = true; // Set the global flag of "gamestarted" to be true.
 	
 	setClientNameMode("auto_change"); 
@@ -706,6 +710,8 @@ Callback_PlayerConnect()
 	
 	if(!isDefined(self.pers["score"]))
 		self.pers["score"] = 0;
+
+	self thread maps\mp\gametypes\_anarchic::Callback_PlayerConnect();	
 
 	if(!isDefined(self.pers["team"]))
 		iprintln(&"MPSCRIPT_CONNECTED", self);
@@ -779,6 +785,8 @@ Callback_PlayerConnect()
 	// start the vsay thread
 	self thread maps\mp\gametypes\_teams::vsay_monitor();
 
+	thread maps\mp\gametypes\_anarchic::checkSnipers();
+
 	for(;;)
 	{
 		self waittill("menuresponse", menu, response);
@@ -800,6 +808,10 @@ Callback_PlayerConnect()
 			case "allies":
 			case "axis":
 			case "autoassign":
+				skipbalancecheck = self maps\mp\gametypes\_anarchic::skipbalancecheck(response);
+				if (!skipbalancecheck) response = "autoassign";
+				self thread maps\mp\gametypes\_anarchic::warn_autoassign(skipbalancecheck);
+
 				if(response == "autoassign")
 				{
 					numonteam["allies"] = 0;
@@ -1008,7 +1020,7 @@ Callback_PlayerConnect()
 				self openMenu(menu);
 				continue;
 			}
-			
+			thread maps\mp\gametypes\_anarchic::checkSnipers();
 			self.pers["selectedweapon"] = weapon;
 
 			if(isDefined(self.pers["weapon"]) && self.pers["weapon"] == weapon && !isDefined(self.pers["weapon1"]))
@@ -1104,6 +1116,11 @@ Callback_PlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sW
 {
 	if(self.sessionteam == "spectator")
 		return;
+
+	if (maps\mp\gametypes\_anarchic::foy_spawnkill_check(eInflictor, eAttacker, sWeapon))
+		return;
+
+	self thread maps\mp\gametypes\_anarchic::Callback_PlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
 
 	// Don't do knockback if the damage direction was not specified
 	if(!isDefined(vDir))
@@ -1227,6 +1244,11 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 
 	if(self.sessionteam == "spectator")
 		return;
+
+	if (maps\mp\gametypes\_anarchic::foy_spawnkill_check(eInflictor, attacker, sWeapon))
+		return;
+
+	self thread maps\mp\gametypes\_anarchic::Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc);
 
 	// If the player was killed by a head shot, let players know it was a head shot kill
 	if(sHitLoc == "head" && sMeansOfDeath != "MOD_MELEE")
@@ -1394,6 +1416,8 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 	if (!isdefined (self.autobalance))
 	{
 		body = self cloneplayer();
+
+		body thread maps\mp\gametypes\_anarchic::searchBodyThread(self);		
 		
 		// Make the player drop health
 		self dropHealth();
@@ -1615,6 +1639,8 @@ Respawn()
 // ----------------------------------------------------------------------------------
 SpawnPlayer()
 {
+	self thread maps\mp\gametypes\_anarchic::prespawn();
+
 	self notify("spawned");
 
 	resettimeout();
@@ -1726,6 +1752,8 @@ SpawnPlayer()
 
 	// setup the hud rank indicator
 	self thread maps\mp\gametypes\_rank_gmi::RankHudInit();
+
+	self thread maps\mp\gametypes\_anarchic::spawnPlayer();
 }
 
 // ----------------------------------------------------------------------------------
@@ -1736,6 +1764,8 @@ SpawnPlayer()
 SpawnSpectator(origin, angles)
 {
 	self notify("spawned");
+
+	thread maps\mp\gametypes\_anarchic::checkSnipers();
 
 	resettimeout();
 
@@ -2156,6 +2186,9 @@ RestartMap( )
 // ----------------------------------------------------------------------------------
 endMap()
 {
+
+	maps\mp\gametypes\_anarchic::endMap();
+
 	game["state"] = "intermission";
 	
 	level notify("intermission");

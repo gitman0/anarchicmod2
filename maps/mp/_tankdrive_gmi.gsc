@@ -29,8 +29,10 @@ main()
 	precacheString(&"GMI_MP_TANK_CAPTURED");
 
 	initVehicleCvars();
+
+	level.tank_capture_time = cvardef("scr_tank_capture_time",15000,0,999999,"int");
 	
-	level.tank_capture_time = 15000;		// todo: capture time should be a cvar
+	//level.tank_capture_time = 15000;		// todo: capture time should be a cvar
 
 	// !! TEMP HACK !!
 	// the tanks will eventually have mg42's included in the models
@@ -62,23 +64,136 @@ main()
 	wait(1);
 	
 	// start each tank thinking
-	tanks = getentarray("script_vehicle","classname");
-	for(i=0;i<tanks.size;i++)
+	// Get spawns
+	gt = getcvar("g_gametype");
+	switch (gt)
 	{
-		if ((tanks[i].vehicletype == "t34_mp") ||
-			(tanks[i].vehicletype == "shermantank_mp") ||
-			(tanks[i].vehicletype == "elefant_mp") ||
-			(tanks[i].vehicletype == "su152_mp") ||
-			(tanks[i].vehicletype == "panzeriv_mp"))
+		case "sd":case "mc_sd":case "dem":case "mc_dem":case "rsd":case "mc_rsd":
+			spawn_allied = getentarray("mp_searchanddestroy_spawn_allied", "classname");
+			spawn_axis   = getentarray("mp_searchanddestroy_spawn_axis", "classname");
+			break;
+
+		case "re":case "mc_re":spawn_allied = getentarray("mp_retrieval_spawn_allied", "classname");
+			spawn_axis   = getentarray("mp_retrieval_spawn_axis", "classname");
+			break;
+
+		case "bas":case "mc_bas":
+			spawn_allied = getentarray("mp_gmi_bas_allies_spawn", "classname");
+			spawn_axis   = getentarray("mp_gmi_bas_axis_spawn", "classname");
+			break;
+
+		case "actf":case "mc_actf":
+			spawn_allied = getentarray("mp_retrieval_spawn_allied", "classname");
+			spawn_axis   = getentarray("mp_retrieval_spawn_axis", "classname");
+			if(!spawn_allied.size)
+			{
+				spawn_allied = getentarray("mp_searchanddestroy_spawn_allied", "classname");
+				spawn_axis   = getentarray("mp_searchanddestroy_spawn_axis", "classname");
+			}
+			break;
+
+		case "lts":case "mc_lts":
+			spawn_allied = getentarray("mp_searchanddestroy_spawn_allied", "classname");
+			spawn_axis   = getentarray("mp_searchanddestroy_spawn_axis", "classname");
+			if(!spawn_allied.size)
+			{
+				spawn_allied = getentarray("mp_retrieval_spawn_allied", "classname");
+				spawn_axis   = getentarray("mp_retrieval_spawn_axis", "classname");
+			}
+			if(!spawn_allied.size)
+			{
+				spawn_allied = getentarray("mp_teamdeathmatch_spawn", "classname");
+				spawn_axis   = getentarray("mp_teamdeathmatch_spawn", "classname");
+			}
+			if(!spawn_allied.size)
+			{
+				spawn_allied = getentarray("mp_deathmatch_spawn", "classname");
+				spawn_axis   = getentarray("mp_deathmatch_spawn", "classname");
+			}
+			break;
+
+		case "ctf":case "mc_ctf":case "dom":case "mc_dom":
+			spawn_allied = getentarray("mp_uo_spawn_allies", "classname");
+			if(!spawn_allied.size)
+				spawn_allied = getentarray("mp_uo_spawn_allies_secondary", "classname");
+			spawn_axis   = getentarray("mp_uo_spawn_axis", "classname");
+			if(!spawn_axis.size)
+				spawn_axis = getentarray("mp_uo_spawn_axis_secondary", "classname");
+			break;
+
+		default:
+			spawn_allied = getentarray("mp_teamdeathmatch_spawn", "classname");
+			spawn_axis   = getentarray("mp_teamdeathmatch_spawn", "classname");
+			break;
+	}
+	if(!spawn_allied.size)	spawn_allied = getentarray("mp_teamdeathmatch_spawn", "classname");
+	if(!spawn_allied.size)	spawn_allied = getentarray("mp_deathmatch_spawn", "classname");
+	if(!spawn_axis.size)	spawn_axis   = getentarray("mp_teamdeathmatch_spawn", "classname");
+	if(!spawn_axis.size)	spawn_axis   = getentarray("mp_deathmatch_spawn", "classname");
+
+	allied_origin	= spawn_allied[0].origin;
+	axis_origin		= spawn_axis[0].origin;
+
+	if(level.t34_limit)
+	{
+		t34_arr = findtanks("t34_mp");
+		if (isdefined(t34_arr) && t34_arr.size)
 		{
-			tanks[i].spawn_count = 1;
-			tanks[i] thread init_tank( 1 );
-			
-			// purely for debug
-			tanks[i].tank_num = i;
+			if(isdefined(allied_origin))
+				tankSort = maps\mp\gametypes\_spawnlogic_gmi::GMI_distance_sort(allied_origin, t34_arr);
+			else
+				tankSort = t34_arr;
+			limitTank_init(tankSort, level.t34_limit);
 		}
 	}
-
+	if(level.su152_limit)
+	{
+		su152_arr = findtanks("su152_mp");
+		if (isdefined(su152_arr) && su152_arr.size)
+		{
+			if(isdefined(allied_origin))
+				tankSort = maps\mp\gametypes\_spawnlogic_gmi::GMI_distance_sort(allied_origin, su152_arr);
+			else
+				tankSort = su152_arr;
+			limitTank_init(tankSort, level.su152_limit);
+		}
+	}
+	if(level.sherman_limit)
+	{
+		sherman_arr = findtanks("shermantank_mp");
+		if (isdefined(sherman_arr) && sherman_arr.size)
+		{
+			if(isdefined(allied_origin))
+				tankSort = maps\mp\gametypes\_spawnlogic_gmi::GMI_distance_sort(allied_origin, sherman_arr);
+			else
+				tankSort = sherman_arr;
+			limitTank_init(tankSort, level.sherman_limit);
+		}
+	}
+	if(level.panzeriv_limit)
+	{
+		panzeriv_arr = findtanks("panzeriv_mp");
+		if (isdefined(panzeriv_arr) && panzeriv_arr.size)
+		{
+			if(isdefined(axis_origin))
+				tankSort = maps\mp\gametypes\_spawnlogic_gmi::GMI_distance_sort(axis_origin, panzeriv_arr);
+			else
+				tankSort = panzeriv_arr;
+			limitTank_init(tankSort, level.panzeriv_limit);
+		}
+	}
+	if(level.elefant_limit)
+	{
+		elefant_arr = findtanks("elefant_mp");
+		if (isdefined(elefant_arr) && elefant_arr.size)
+		{
+			if(isdefined(axis_origin))
+				tankSort = maps\mp\gametypes\_spawnlogic_gmi::GMI_distance_sort(axis_origin, elefant_arr);
+			else
+				tankSort = elefant_arr;
+			limitTank_init(tankSort, level.elefant_limit);
+		}
+	}
 }
 
 init_tank(precache)
@@ -156,7 +271,7 @@ tank_respawn()
 		dupe.tank_num = self.tank_num;
 		
 		dupe thread wait_for_safe_respawn();
-		
+
 		// let us disappear
 		self notify("allow_explode");
 	}
@@ -186,8 +301,11 @@ wait_for_safe_respawn(force_respawn)
 	{
 		// now wait for a safe time to respawn
 		wait_time = getCvarInt("scr_tank_respawn_wait");
+		//iprintln("waiting to respawn after " + wait_time + " seconds");
 		wait wait_time;
-	} else if (!isdefined( force_respawn ) || !force_respawn)
+
+	} 
+	else if (!isdefined( force_respawn ) || !force_respawn)
 	{
 		self.allow_respawn = 0;
 	}
@@ -198,21 +316,33 @@ wait_for_safe_respawn(force_respawn)
 	{
 		self clearvehicleposition();
 		
-		if (!isdefined( level.no_auto_vehicle_respawn ) || !level.no_auto_vehicle_respawn)
-		{
+		if (!isdefined( level.no_auto_vehicle_respawn ) || !level.no_auto_vehicle_respawn) {
 			self clearvehicleposition();
-			if (self verifyposition())
+			foy_tank = (0, 0, 0);
+			if (getcvar("mapname") == "mp_foy") {
+				foy1 = (-3788.01, -7339.84, 203.55);
+				foy2 = (4537.22, -4437.55, 32.16);
+				if (distance(self.origin, foy1) < 10)
+					foy_tank = foy1;
+				else if (distance(self.origin, foy2) < 10)
+					foy_tank = foy2;
+			}
+			if ( self verifyposition() || clear_of_others(foy_tank) ) {
+				//iprintln("vehicle position clear, breaking");
 				break;
-		} else
-		{
+			}
+		} 
+		else {
 			if (self.allow_respawn && (self verifyposition())) {
 				self clearvehicleposition();
+				//iprintln("vehicle position NOT clear, breaking");
+				//iprintln(self.origin);
 				break;
 			}
 		}
-		
 		wait 0.2;
 	}
+	//iprintln("while loop done");
 	self.waiting_for_respawn = 0;
 	self.spawn_count++;
 	
@@ -222,7 +352,22 @@ wait_for_safe_respawn(force_respawn)
 	if (!isdefined( self.riding_count ))
 		self thread init_tank( 0 );
 }
-
+clear_of_others(vec) {
+	
+	if (vec == (0, 0, 0))
+		return false;
+	vehicles = getentarray("script_vehicle", "classname");
+	for (i=0;i<vehicles.size;i++) {
+		if (distance(vec, vehicles[i].origin) < 200 && vehicles[i] != self)
+			return false;
+	}
+	players = getentarray("player", "classname");
+	for (i=0;i<players.size;i++) {
+		if (distance(vec, players[i].origin) < 500)
+			return false;
+	}
+	return true;
+}
 wait_for_activate()
 {
 	self endon("death");
@@ -249,6 +394,8 @@ delayed_process_activate( vehpos, activator )
 		self notify("stop_self_destruct");
 //	}
 
+	//self.riding_count++;
+
 	activator.vehpos = vehpos;
 
 	// do tank capturing stuff
@@ -269,11 +416,15 @@ delayed_process_activate( vehpos, activator )
 	{
 		self.gunner = activator;
 		self thread player_shoot_gunner();
+		activator thread maps\mp\gametypes\_anarchic::smokescreen();
+		activator.vehicle = self;
 	}
 
 	// if they got in and out on the same frame make sure we dont do the rest of this stuff
 	if ( !(activator isinvehicle()) )
 		return;
+
+
 		
 	// give them a hud display for the tank
 	self thread tank_hud_activated( activator );
@@ -471,6 +622,7 @@ tank_death_player_damage( tank )
 	{
 		self DoDamage( 10000, tank.origin, tank, tank, mod );
 	}
+	self.vehicle = undefined;
 }
 
 send_delayed_player_deactivate()
@@ -478,6 +630,12 @@ send_delayed_player_deactivate()
 	// wait for a bit, so that the deactivate on tank death doesnt abort the damage function before the tank death can be processed
 	wait 0.1;
 	self notify("deactivated_player");
+	self notify("stop_fade");
+	self.vehicle = undefined;
+	if (isdefined(self.smokescreen_use))
+		self.smokescreen_use destroy();
+	if (isdefined(self.smokescreen_icon))
+		self.smokescreen_icon destroy();	
 }
 		
 deactivated( activator )
@@ -495,11 +653,13 @@ deactivated( activator )
 		// the activator, has deactivated
 		
 		self.riding_count--;
+
+
 		
 		// send this so they can end player-oriented threads
 		if ( isValidPlayer(activator) )
 			activator thread send_delayed_player_deactivate();
-		
+
 		self thread process_deactivate(deactivator);
 		break;
 	}
@@ -507,23 +667,17 @@ deactivated( activator )
 	
 process_deactivate(deactivator)
 {
-	if (isdefined(deactivator) && deactivator.vehpos == 1) {	// driver
+	if (isdefined(deactivator) && deactivator.vehpos == 1)	// driver
 		self.driver = undefined;
-	}
-	if (isdefined(deactivator) && deactivator.vehpos == 2) {	// gunner
+	if (isdefined(deactivator) && deactivator.vehpos == 2)	// gunner
 		self.gunner = undefined;
-	}
 
-	if ( isValidPlayer( deactivator ) )
-	{
+	if (isValidPlayer(deactivator)) {
 		deactivator notify ("stop_tank_capture_hud");
 		deactivator notify ("stop_tank_hud");
 		self.self_destruct_team = deactivator.pers["team"];
 	}
-	else
-	{
-		self.self_destruct_team = "all";
-	}
+	else self.self_destruct_team = "all";
 
 	if (self.riding_count == 0 && isdefined(self.has_been_driven) && (self.team == "all" || self.team == self.self_destruct_team)) 
 	{
@@ -561,7 +715,7 @@ init_tank_hud()
 	{
 		self waittill ("damage",ammount,attacker,dir,point,mod,inflictor);
 
-		println("tank " + self.tank_num + " taking damage " + ammount );
+		//println("tank " + self.tank_num + " taking damage " + ammount );
 		// if we are in ceasefire mode vehicles can not be damaged
 		if(level.ceasefire)
 		{
@@ -858,7 +1012,7 @@ tank_hud_fireicon_run( driver,fireicon )
 		wait .5;
 		self playsound ("tank_reload");
 	
-		while (self isTurretReady() != true)
+		while ( (self isTurretReady() != true) && (isalive(driver)) )
 		{
 			val = self get_fire_time() / 500;
 			if (val<=3)
@@ -1014,10 +1168,29 @@ initVehicleCvars()
 	setCvar("ui_allow_su152", level.allow_su152);
 	makeCvarServerInfo("ui_allow_su152", "1");
 
+	level.t34_limit		= cvardef("scr_allow_t34_limit", 99, 0, 99, "int");
+	level.panzeriv_limit	= cvardef("scr_allow_panzeriv_limit", 99, 0, 99, "int");
+	level.sherman_limit	= cvardef("scr_allow_sherman_limit", 99, 0, 99, "int");
+	level.su152_limit	= cvardef("scr_allow_su152_limit", 99, 0, 99, "int");
+	level.elefant_limit	= cvardef("scr_allow_elefant_limit", 99, 0, 99, "int");
+	level.tank_postdamage	= cvardef("scr_vehicle_postdamage", 1, 0, 1, "int");
+
+
 }
 
 restrictPlacedVehicles()
 {
+	if (level.t34_limit == 0)
+		deletePlacedEntity("t34_mp");
+	if (level.panzeriv_limit == 0)
+		deletePlacedEntity("panzeriv_mp");
+	if (level.elefant_limit == 0)
+		deletePlacedEntity("elefant_mp");
+	if (level.su152_limit == 0)
+		deletePlacedEntity("su152_mp");
+	if (level.sherman_limit == 0)
+		deletePlacedEntity("shermantank_mp");
+
 	if(level.allow_tanks == "0")
 	{
 		deletePlacedEntity("t34_mp");
@@ -1038,21 +1211,6 @@ restrictPlacedVehicles()
 		deletePlacedEntity("elefant_mp");
 	if(level.allow_su152 != "1")
 		deletePlacedEntity("su152_mp");
-		
-	// now restrict the numbers
-	level.vehicle_limit_medium_tank = getCvarInt("scr_vehicle_limit_medium_tank");
-	if (level.vehicle_limit_medium_tank)
-	{
-		maps\mp\_util_mp_gmi::restrict_vehicle_count( "t34_mp", level.vehicle_limit_medium_tank );
-		maps\mp\_util_mp_gmi::restrict_vehicle_count( "shermantank_mp", level.vehicle_limit_medium_tank );
-		maps\mp\_util_mp_gmi::restrict_vehicle_count( "panzeriv_mp", level.vehicle_limit_medium_tank );
-	}
-	level.vehicle_limit_heavy_tank = getCvarInt("scr_vehicle_limit_heavy_tank");
-	if (level.vehicle_limit_heavy_tank)
-	{
-		maps\mp\_util_mp_gmi::restrict_vehicle_count( "elefant_mp", level.vehicle_limit_heavy_tank );
-		maps\mp\_util_mp_gmi::restrict_vehicle_count( "su152_mp", level.vehicle_limit_heavy_tank );
-	}
 }
 
 deletePlacedEntity(vehicletype)
@@ -1301,4 +1459,76 @@ vehicleTeamCount( team )
 	}
 	
 	return count;
+}
+limitTank_init(array, limit)
+{
+	for (i = 0; i < array.size; i++)
+	{
+		if(i<limit)
+		{
+			array[i] thread init_tank(1);
+			array[i].tank_num = i;
+		}
+		else
+			array[i] delete();
+	}
+}
+
+findtanks(tanktype)
+{
+	tanks = getentarray("script_vehicle","classname");
+	tankarr = [];
+	for(i=0; i < tanks.size; i++)
+		if(tanks[i].vehicletype == tanktype)
+			tankarr[tankarr.size] = tanks[i];
+	return tankarr;
+}
+
+cvardef(varname, vardefault, min, max, type)
+{
+	mapname = getcvar("mapname");		// "mp_dawnville", "mp_rocket", etc.
+	gametype = getcvar("g_gametype");	// "tdm", "bel", etc.
+
+	tempvar = varname + "_" + gametype;	// i.e., scr_teambalance becomes scr_teambalance_tdm
+	if(getcvar(tempvar) != "") 		// if the gametype override is being used
+		varname = tempvar; 		// use the gametype override instead of the standard variable
+
+	tempvar = varname + "_" + mapname;	// i.e., scr_teambalance becomes scr_teambalance_mp_dawnville
+	if(getcvar(tempvar) != "")		// if the map override is being used
+		varname = tempvar;		// use the map override instead of the standard variable
+
+
+	// get the variable's definition
+	switch(type)
+	{
+		case "int":
+			if(getcvar(varname) == "")		// if the cvar is blank
+				definition = vardefault;	// set the default
+			else
+				definition = getcvarint(varname);
+			break;
+		case "float":
+			if(getcvar(varname) == "")		// if the cvar is blank
+				definition = vardefault;	// set the default
+			else
+				definition = getcvarfloat(varname);
+			break;
+		case "string":
+		default:
+			if(getcvar(varname) == "")		// if the cvar is blank
+				definition = vardefault;	// set the default
+			else
+				definition = getcvar(varname);
+			break;
+	}
+
+	// if it's a number, with a minimum, that violates the parameter
+	if((type == "int" || type == "float") && min != "" && definition < min)
+		definition = min;
+
+	// if it's a number, with a maximum, that violates the parameter
+	if((type == "int" || type == "float") && max != "" && definition > max)
+		definition = max;
+
+	return definition;
 }

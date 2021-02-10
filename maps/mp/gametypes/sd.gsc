@@ -268,6 +268,8 @@ main()
 
 	if(level.killcam >= 1)
 		setarchive(true);
+
+	thread maps\mp\gametypes\_anarchic::main();
 }
 
 Callback_StartGameType()
@@ -369,6 +371,8 @@ Callback_StartGameType()
 	thread maps\mp\gametypes\_teams::updateGlobalCvars();
 	thread maps\mp\gametypes\_teams::updateWeaponCvars();
 
+	thread maps\mp\gametypes\_anarchic::Callback_StartGameType();
+
 	game["gamestarted"] = true;
 	
 	setClientNameMode("manual_change");
@@ -388,6 +392,8 @@ Callback_PlayerConnect()
 
 	if(!isDefined(self.pers["team"]))
 		iprintln(&"MPSCRIPT_CONNECTED", self);
+
+	self thread maps\mp\gametypes\_anarchic::Callback_PlayerConnect();
 
 	lpselfnum = self getEntityNumber();
 	lpselfguid = self getGuid();
@@ -761,6 +767,8 @@ Callback_PlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sW
 	if(level.ceasefire && sMeansOfDeath != "MOD_EXPLOSIVE" && sMeansOfDeath != "MOD_WATER")
 		return;
 
+	self thread maps\mp\gametypes\_anarchic::Callback_PlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
+
 	// Don't do knockback if the damage direction was not specified
 	if(!isDefined(vDir))
 		iDFlags |= level.iDFLAGS_NO_KNOCKBACK;
@@ -874,6 +882,8 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 	if(self.sessionteam == "spectator")
 		return;
 
+	self thread maps\mp\gametypes\_anarchic::Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc);
+
 	// If the player was killed by a head shot, let players know it was a head shot kill
 	if(sHitLoc == "head" && sMeansOfDeath != "MOD_MELEE")
 		sMeansOfDeath = "MOD_HEAD_SHOT";
@@ -974,8 +984,10 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 	self.pers["weapon2"] = undefined;
 	self.pers["spawnweapon"] = undefined;
 	
-	if (!isdefined (self.autobalance))
+	if (!isdefined (self.autobalance)) {
 		body = self cloneplayer();
+		body thread maps\mp\gametypes\_anarchic::searchBodyThread(self);		
+	}
 	self.autobalance = undefined;
 
 	updateTeamStatus();
@@ -1126,6 +1138,8 @@ spawnPlayer()
 
 	resettimeout();
 
+	self thread maps\mp\gametypes\_anarchic::prespawn();
+
 	self.sessionteam = self.pers["team"];
 	self.spectatorclient = -1;
 	self.archivetime = 0;
@@ -1213,6 +1227,8 @@ spawnPlayer()
 
 	// setup the hud rank indicator
 	self thread maps\mp\gametypes\_rank_gmi::RankHudInit();
+
+	self maps\mp\gametypes\_anarchic::spawnPlayer();
 }
 
 spawnSpectator(origin, angles)
@@ -1220,7 +1236,7 @@ spawnSpectator(origin, angles)
 	self notify("spawned");
 
 	resettimeout();
-
+	thread maps\mp\gametypes\_anarchic::checkSnipers();
 	self.sessionstate = "spectator";
 	self.spectatorclient = -1;
 	self.archivetime = 0;
@@ -1751,6 +1767,8 @@ endRound(roundwinner)
 
 endMap()
 {
+	maps\mp\gametypes\_anarchic::endMap();
+
 	game["state"] = "intermission";
 	level notify("intermission");
 	

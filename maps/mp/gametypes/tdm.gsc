@@ -67,17 +67,7 @@ Spectators spawn randomly at one of these positions.
 
 main()
 {
-	spawnpointname = "mp_teamdeathmatch_spawn";
-	spawnpoints = getentarray(spawnpointname, "classname");
-	
-	if(!spawnpoints.size)
-	{
-		maps\mp\gametypes\_callbacksetup::AbortLevel();
-		return;
-	}
-
-	for(i = 0; i < spawnpoints.size; i++)
-		spawnpoints[i] placeSpawnpoint();
+	maps\mp\gametypes\_anarchic::place_spawnpoints();
 
 	level.callbackStartGameType = ::Callback_StartGameType;
 	level.callbackPlayerConnect = ::Callback_PlayerConnect;
@@ -165,6 +155,8 @@ main()
 	
 	if(level.killcam >= 1)
 		setarchive(true);
+
+	maps\mp\gametypes\_anarchic::main();
 }
 
 Callback_StartGameType()
@@ -174,6 +166,9 @@ Callback_StartGameType()
 		game["allies"] = "american";
 	if(!isDefined(game["axis"]))
 		game["axis"] = "german";
+
+	// override teams for rifles-only
+	maps\mp\gametypes\_anarchic::teamoverride();
 
 	if(!isDefined(game["layoutimage"]))
 		game["layoutimage"] = "default";
@@ -199,6 +194,8 @@ Callback_StartGameType()
 	game["menu_quickresponses"] = "quickresponses";
 	game["menu_quickvehicles"] = "quickvehicles";
 	game["menu_quickrequests"] = "quickrequests";
+	game["menu_quickwhispers"] = "quickwhispers";
+
 
 	precacheString(&"MPSCRIPT_PRESS_ACTIVATE_TO_RESPAWN");
 	precacheString(&"MPSCRIPT_KILLCAM");
@@ -215,6 +212,7 @@ Callback_StartGameType()
 	precacheMenu(game["menu_quickresponses"]);
 	precacheMenu(game["menu_quickvehicles"]);
 	precacheMenu(game["menu_quickrequests"]);
+	precacheMenu(game["menu_quickwhispers"]);
 
 	precacheShader("black");
 	precacheShader("hudScoreboard_mp");
@@ -235,8 +233,10 @@ Callback_StartGameType()
 	setClientNameMode("auto_change");
 	
 	thread startGame();
-	//thread addBotClients(); // For development testing
+	thread addBotClients(); // For development testing
 	thread updateGametypeCvars();
+
+	maps\mp\gametypes\_anarchic::Callback_StartGameType();
 }
 
 Callback_PlayerConnect()
@@ -246,7 +246,11 @@ Callback_PlayerConnect()
 	self.statusicon = "";
 	self.pers["teamTime"] = 1000000;
 	
-	iprintln(&"MPSCRIPT_CONNECTED", self);
+	maps\mp\gametypes\_anarchic::Callback_PlayerConnect();	
+
+	if (!level.disable_announce) {
+		iprintln(&"MPSCRIPT_CONNECTED", self);
+	}
 
 	lpselfnum = self getEntityNumber();
 	lpGuid = self getGuid();
@@ -263,11 +267,16 @@ Callback_PlayerConnect()
 	
 	level endon("intermission");
 
+	// make sure that the rank variable is initialized
+	if ( !isDefined( self.pers["rank"] ) )
+		self.pers["rank"] = 0;
+
 	// start the vsay thread
 	self thread maps\mp\gametypes\_teams::vsay_monitor();
 
 	if(isDefined(self.pers["team"]) && self.pers["team"] != "spectator")
 	{
+		maps\mp\gametypes\_anarchic::checkSnipers();
 		self setClientCvar("ui_weapontab", "1");
 
 		if(self.pers["team"] == "allies")
@@ -327,6 +336,10 @@ Callback_PlayerConnect()
 			case "allies":
 			case "axis":
 			case "autoassign":
+				skipbalancecheck = self maps\mp\gametypes\_anarchic::skipbalancecheck(response);
+				if (!skipbalancecheck) response = "autoassign";
+				self maps\mp\gametypes\_anarchic::warn_autoassign(skipbalancecheck);
+
 				if(response == "autoassign")
 				{
 					numonteam["allies"] = 0;
@@ -447,6 +460,8 @@ Callback_PlayerConnect()
 				self.pers["weapon"] = undefined;
 				self.pers["savedmodel"] = undefined;
 
+				maps\mp\gametypes\_anarchic::checkSnipers();
+
 				// if there are weapons the user can select then open the weapon menu
 				if ( maps\mp\gametypes\_teams::isweaponavailable(self.pers["team"]) )
 				{
@@ -502,7 +517,7 @@ Callback_PlayerConnect()
 				break;
 			}
 		}		
-		else if(menu == game["menu_weapon_allies"] || menu == game["menu_weapon_axis"])
+		else if( (menu == game["menu_weapon_allies"] || menu == game["menu_weapon_axis"]) && !self.choosing_secondary)
 		{
 			if(response == "team")
 			{
@@ -530,7 +545,9 @@ Callback_PlayerConnect()
 				self openMenu(menu);
 				continue;
 			}
-			
+
+			maps\mp\gametypes\_anarchic::checkSnipers();			
+
 			if(isDefined(self.pers["weapon"]) && self.pers["weapon"] == weapon)
 				continue;
 			
@@ -586,12 +603,18 @@ Callback_PlayerConnect()
 			maps\mp\gametypes\_teams::quickvehicles(response);
 		else if(menu == game["menu_quickrequests"])
 			maps\mp\gametypes\_teams::quickrequests(response);
+		else if(menu == game["menu_quickwhispers"])
+			maps\mp\gametypes\_teams::quickwhispers(response);
 	}
 }
 
 Callback_PlayerDisconnect()
 {
-	iprintln(&"MPSCRIPT_DISCONNECTED", self);
+
+	self notify("death");
+
+	if (!level.disable_announce)
+		iprintln(&"MPSCRIPT_DISCONNECTED", self);
 	
 	lpselfnum = self getEntityNumber();
 	lpGuid = self getGuid();
@@ -602,6 +625,16 @@ Callback_PlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sW
 {
 	if(self.sessionteam == "spectator")
 		return;
+	if (isplayer(eAttacker)) {
+		if ( isdefined(eAttacker.sessionteam) && (eAttacker.sessionteam == "spectator") )
+			return;
+	}
+
+	if (maps\mp\gametypes\_anarchic::foy_spawnkill_check(eInflictor, eAttacker, sWeapon))
+		return;
+
+	self maps\mp\gametypes\_anarchic::Callback_PlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
+	iDamage = level.anarchic_idamage;
 
 	// dont take damage during ceasefire mode
 	// but still take damage from ambient damage (water, minefields, fire)
@@ -720,6 +753,15 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 	
 	if(self.sessionteam == "spectator")
 		return;
+	if (isplayer(attacker)) {
+		if ( isdefined(attacker.sessionteam) && (attacker.sessionteam == "spectator"))
+			return;
+	}
+
+	if (maps\mp\gametypes\_anarchic::foy_spawnkill_check(eInflictor, attacker, sWeapon))
+		return;
+
+	maps\mp\gametypes\_anarchic::Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc);
 
 	// If the player was killed by a head shot, let players know it was a head shot kill
 	if(sHitLoc == "head" && sMeansOfDeath != "MOD_MELEE")
@@ -736,7 +778,9 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 		sMeansOfDeath = "MOD_ARTILLERY";
 
 	// send out an obituary message to all clients about the kill
-	obituary(self, attacker, sWeapon, sMeansOfDeath);
+	if (level.disableobits != 1) {
+		obituary(self, attacker, sWeapon, sMeansOfDeath);
+	}
 	
 	self.sessionstate = "dead";
 	self.statusicon = "gfx/hud/hud@status_dead.tga";
@@ -812,7 +856,7 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 		
 		self.score--;
 		
-		if (level.teamkill_penalty)
+		if ( isdefined(level.teamkill_penalty) && (level.teamkill_penalty))
 		{
 			//penalize team as well
 			teamscore = getTeamScore(self.pers["team"]);
@@ -840,6 +884,8 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 	self.autobalance = undefined;
 	body = self cloneplayer();
 
+	body thread maps\mp\gametypes\_anarchic::searchBodyThread(self);
+
 	delay = 2;	// Delay the player becoming a spectator till after he's done dying
 	wait delay;	// ?? Also required for Callback_PlayerKilled to complete before respawn/killcam can execute
 
@@ -863,7 +909,8 @@ menu_spawn(weapon)
 	{
 		self.pers["weapon"] = weapon;
 		spawnPlayer();
-		self thread printJoinedTeam(self.pers["team"]);
+		if (!level.disable_announce)
+			self thread printJoinedTeam(self.pers["team"]);
 	}
 	else
 	{
@@ -882,6 +929,9 @@ menu_spawn(weapon)
 
 spawnPlayer()
 {
+
+	self maps\mp\gametypes\_anarchic::prespawn();
+
 	self notify("spawned");
 	self notify("end_respawn");
 	
@@ -893,9 +943,9 @@ spawnPlayer()
 	self.archivetime = 0;
 	self.friendlydamage = undefined;
 		
-	spawnpointname = "mp_teamdeathmatch_spawn";
+	spawnpointname = self maps\mp\gametypes\_anarchic::getspawnpoint(self.pers["team"]);
 	spawnpoints = getentarray(spawnpointname, "classname");
-	spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_NearTeam(spawnpoints);
+	spawnpoint = maps\mp\gametypes\_anarchic::getspawnmethod(spawnpoints);
 
 	if(isDefined(spawnpoint))
 		self spawn(spawnpoint.origin, spawnpoint.angles);
@@ -951,12 +1001,16 @@ spawnPlayer()
 
 	// setup the hud rank indicator
 	self thread maps\mp\gametypes\_rank_gmi::RankHudInit();
+
+	self maps\mp\gametypes\_anarchic::spawnPlayer();
 }
 
 spawnSpectator(origin, angles)
 {
 	self notify("spawned");
 	self notify("end_respawn");
+
+	maps\mp\gametypes\_anarchic::checkSnipers();
 
 	resettimeout();
 
@@ -983,6 +1037,7 @@ spawnSpectator(origin, angles)
 	}
 	
 	self setClientCvar("cg_objectiveText", &"TDM_ALLIES_KILL_AXIS_PLAYERS");
+	self thread maps\mp\gametypes\_anarchic::spawnSpectator();
 }
 
 spawnIntermission()
@@ -1277,6 +1332,9 @@ startGame()
 
 endMap()
 {
+
+	maps\mp\gametypes\_anarchic::endMap();
+
 	game["state"] = "intermission";
 	level notify("intermission");
 	

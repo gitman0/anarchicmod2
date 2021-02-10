@@ -394,6 +394,7 @@ precache()
 		precacheItem("binoculars_mp");
 		precacheItem("binoculars_artillery_mp");
 		precacheItem("satchelcharge_mp");
+		precacheItem("enfield_mp");
 		break;
 	
 	case "british":
@@ -404,7 +405,9 @@ precache()
 		precacheItem("flashgrenade_mp");
 		precacheItem("webley_mp");
 		precacheItem("enfield_mp");
+		precacheItem("m1carbine_mp");
 		precacheItem("sten_mp");
+		precacheItem("sten_silenced_mp");
 		precacheItem("bren_mp");
 		precacheItem("springfield_mp");
 		precacheItem("mg30cal_mp");
@@ -449,6 +452,8 @@ precache()
 		precacheItem("binoculars_mp");
 		precacheItem("binoculars_artillery_mp");
 		precacheItem("satchelcharge_mp");
+		//precacheItem("fg42_ns_mp");
+		precacheItem("ranger_knife_mp");
 		break;
 	}
 	
@@ -623,6 +628,13 @@ initWeaponCvars()
 	setCvar("ui_allow_sten", level.allow_sten);
 	makeCvarServerInfo("ui_allow_sten", "1");
 
+	level.allow_sten_silenced = getCvar("scr_allow_sten_silenced");
+	if(level.allow_sten_silenced == "")
+		level.allow_sten_silenced = "1";
+	setCvar("scr_allow_sten_silenced", level.allow_sten_silenced);
+	setCvar("ui_allow_sten_silenced", level.allow_sten_silenced);
+	makeCvarServerInfo("ui_allow_sten_silenced", "1");
+
 	level.allow_bren = getCvar("scr_allow_bren");
 	if(level.allow_bren == "")
 		level.allow_bren = "1";
@@ -713,6 +725,13 @@ initWeaponCvars()
 	setCvar("scr_allow_fg42", level.allow_fg42);
 	setCvar("ui_allow_fg42", level.allow_fg42);
 	makeCvarServerInfo("ui_allow_fg42", "0");
+
+	level.allow_fg42_ns = getCvar("scr_allow_fg42_ns");
+	if(level.allow_fg42_ns == "")
+		level.allow_fg42_ns = "1";
+	setCvar("scr_allow_fg42_ns", level.allow_fg42_ns);
+	setCvar("ui_allow_fg42_ns", level.allow_fg42_ns);
+	makeCvarServerInfo("ui_allow_fg42_ns", "1");
 
 	level.allow_panzerfaust = getCvar("scr_allow_panzerfaust");
 	if(level.allow_panzerfaust == "")
@@ -924,6 +943,14 @@ updateWeaponCvars()
 			setCvar("ui_allow_sten", level.allow_sten);
 		}
 
+		scr_allow_sten_silenced = getCvar("scr_allow_sten_silenced");
+		if(level.allow_sten_silenced != scr_allow_sten_silenced)
+		{
+			level.allow_sten_silenced = scr_allow_sten_silenced;
+			setCvar("ui_allow_sten_silenced", level.allow_sten_silenced);
+		}
+
+
 		scr_allow_bren = getCvar("scr_allow_bren");
 		if(level.allow_bren != scr_allow_bren)
 		{
@@ -1013,6 +1040,13 @@ updateWeaponCvars()
 		{
 			level.allow_fg42 = scr_allow_fg42;
 			setCvar("ui_allow_fg42", level.allow_fg42);
+		}
+
+		scr_allow_fg42_ns = getCvar("scr_allow_fg42_ns");
+		if(level.allow_fg42_ns != scr_allow_fg42_ns)
+		{
+			level.allow_fg42_ns = scr_allow_fg42_ns;
+			setCvar("ui_allow_fg42_ns", level.allow_fg42_ns);
 		}
 
 		scr_allow_panzerfaust = getCvar("scr_allow_panzerfaust");
@@ -1107,6 +1141,8 @@ restrictPlacedWeapons()
 		deletePlacedEntity("mpweapon_enfield");
 	if(level.allow_sten != "1")
 		deletePlacedEntity("mpweapon_sten");
+	if(level.allow_sten != "1")
+		deletePlacedEntity("mpweapon_sten_silenced");
 	if(level.allow_bren != "1")
 		deletePlacedEntity("mpweapon_bren");
 	if(level.allow_nagant != "1")
@@ -1133,6 +1169,8 @@ restrictPlacedWeapons()
 		deletePlacedEntity("mpweapon_mg34");
 	if(level.allow_fg42 != "1")
 		deletePlacedEntity("mpweapon_fg42");
+	if(level.allow_fg42_ns != "1")
+		deletePlacedEntity("mpweapon_fg42_ns");
 	if(level.allow_panzerfaust != "1")
 		deletePlacedEntity("mpweapon_panzerfaust");
 	if(level.allow_panzerschreck != "1")
@@ -1197,6 +1235,7 @@ givePistol()
 		{
 		case "american":
 			pistoltype = "colt_mp";
+			//pistoltype = "ranger_knife_mp";
 			break;
 
 		case "british":
@@ -1335,6 +1374,7 @@ getWeaponBasedSmokeGrenadeCount(weapon)
 	case "thompson_mp":
 	case "thompson_semi_mp":
 	case "sten_mp":
+	case "sten_silenced_mp":
 	case "ppsh_mp":
 	case "ppsh_semi_mp":
 	case "mp40_mp":	
@@ -1343,6 +1383,8 @@ getWeaponBasedSmokeGrenadeCount(weapon)
 	case "bren_mp":
 	case "mp44_mp":
 	case "mp44_semi_mp":
+	case "fg42_ns_mp":
+	case "fg42_ns_semi_mp":
 		return 1;
 	case "springfield_mp":
 	case "mosin_nagant_sniper_mp":
@@ -1454,6 +1496,7 @@ getWeaponBasedGrenadeCount(weapon)
 	case "thompson_mp":
 	case "thompson_semi_mp":
 	case "sten_mp":
+	case "sten_silenced_mp":
 	case "ppsh_mp":
 	case "ppsh_semi_mp":
 	case "mp40_mp":	
@@ -1462,6 +1505,8 @@ getWeaponBasedGrenadeCount(weapon)
 	case "bren_mp":
 	case "mp44_mp":
 	case "mp44_semi_mp":
+	case "fg42_ns_mp":
+	case "fg42_ns_semi_mp":
 		return 2;
 	case "springfield_mp":
 	case "mosin_nagant_sniper_mp":
@@ -1549,6 +1594,14 @@ restrict(response)
 		case "american":
 			switch(response)		
 			{
+			case "enfield_mp":
+				if(!getcvar("scr_allow_enfield"))
+				{
+					self iprintln(&"MPSCRIPT_LEEENFIELD_IS_A_RESTRICTED");
+					response = "restricted";
+				}
+				break;
+
 			case "m1carbine_mp":
 				if(!getcvar("scr_allow_m1carbine"))
 				{
@@ -1605,6 +1658,14 @@ restrict(response)
 		case "british":
 			switch(response)		
 			{
+			case "m1carbine_mp":
+				if(!getcvar("scr_allow_m1carbine"))
+				{
+					self iprintln(&"MPSCRIPT_M1A1_CARBINE_IS_A_RESTRICTED");
+					response = "restricted";
+				}
+				break;
+
 			case "enfield_mp":
 				if(!getcvar("scr_allow_enfield"))
 				{
@@ -1617,6 +1678,14 @@ restrict(response)
 				if(!getcvar("scr_allow_sten"))
 				{
 					self iprintln(&"MPSCRIPT_STEN_IS_A_RESTRICTED");
+					response = "restricted";
+				}
+				break;
+
+			case "sten_silenced_mp":
+				if(!getcvar("scr_allow_sten_silenced"))
+				{
+					self iprintln(&"GMI_WEAPON_SILENCED_STEN_IS_A_RESTRICTED");
 					response = "restricted";
 				}
 				break;
@@ -1753,6 +1822,14 @@ restrict(response)
 					response = "restricted";
 				}
 				break;
+			case "fg42_ns_mp":
+				if(!getcvar("scr_allow_fg42_ns"))
+				{
+					self iprintln(&"MPSCRIPT_FG42_IS_A_RESTRICTED");
+					response = "restricted";
+				}
+				break;
+
 			default:
 				self iprintln(&"MPSCRIPT_UNKNOWN_WEAPON_SELECTED");
 				response = "restricted";
@@ -1831,6 +1908,14 @@ restrict_anyteam(response)
 				}
 				break;
 
+			case "sten_silenced_mp":
+				if(!getcvar("scr_allow_sten_silenced"))
+				{
+					self iprintln(&"GMI_WEAPON_SILENCED_STEN_IS_A_RESTRICTED");
+					response = "restricted";
+				}
+				break;
+
 			case "bren_mp":
 				if(!getcvar("scr_allow_bren"))
 				{
@@ -1891,6 +1976,14 @@ restrict_anyteam(response)
 				if(!getcvar("scr_allow_gewehr43"))
 				{
 					self iprintln(&"GMI_WEAPON_GEWEHR43_IS_A_RESTRICTED");
+					response = "restricted";
+				}
+				break;
+
+			case "fg42_ns_mp":
+				if(!getcvar("scr_allow_fg42_ns"))
+				{
+					self iprintln(&"MPSCRIPT_FG42_IS_A_RESTRICTED");
 					response = "restricted";
 				}
 				break;
@@ -3309,7 +3402,196 @@ quickresponses(response)
 
 	self restoreHeadIcon();	
 }
+quickwhispers(response)
+{
+	if(!isdefined(self.pers["team"]) || self.pers["team"] == "spectator" || isdefined(self.spamdelay))
+		return;
 
+	if(self.pers["team"] == "allies")
+	{
+		switch(game["allies"])		
+		{
+		case "american":
+			switch(response)		
+			{
+			case "1":
+				soundalias = "us_whisp_hey";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_1_HEY";
+				break;
+			case "2":
+				soundalias = "us_whisp_shh";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_2_SHHH";
+				break;
+			case "3":
+				soundalias = "us_whisp_followme";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_3_FOLLOW_ME";
+				break;
+			case "4":
+				soundalias = "us_whisp_getdown";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_4_GET_DOWN";
+				break;
+			case "5":
+				soundalias = "us_whisp_holdposition";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_5_HOLD_THIS_POSITION";
+				break;
+			case "6":
+				soundalias = "us_whisp_onpoint";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_6_YOURE_ON_POINT";
+				break;
+			case "7":
+				soundalias = "us_whisp_hearsomething";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_7_DID_YOU_HEAR_SOMETHING";
+				break;
+			case "8":
+				soundalias = "us_whisp_whatwasthat";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_8_WHAT_WAS_THAT";
+				break;
+
+			default:
+				return;
+			}
+			break;
+
+		case "british":
+			switch(response)		
+			{
+			case "1":
+				soundalias = "uk_whisp_hey";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_1_HEY";
+				break;
+			case "2":
+				soundalias = "uk_whisp_shh";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_2_SHHH";
+				break;
+			case "3":
+				soundalias = "uk_whisp_followme";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_3_FOLLOW_ME";
+				break;
+			case "4":
+				soundalias = "uk_whisp_getdown";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_4_GET_DOWN";
+				break;
+			case "5":
+				soundalias = "uk_whisp_holdposition";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_5_HOLD_THIS_POSITION";
+				break;
+			case "6":
+				soundalias = "uk_whisp_onpoint";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_6_YOURE_ON_POINT";
+				break;
+			case "7":
+				soundalias = "uk_whisp_hearsomething";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_7_DID_YOU_HEAR_SOMETHING";
+				break;
+			case "8":
+				soundalias = "uk_whisp_whatwasthat";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_8_WHAT_WAS_THAT";
+				break;
+
+			default:
+				return;
+			}
+			break;
+
+		case "russian":
+			switch(response)		
+			{
+			case "1":
+				soundalias = "ru_whisp_hey";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_1_HEY";
+				break;
+			case "2":
+				soundalias = "ru_whisp_shh";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_2_SHHH";
+				break;
+			case "3":
+				soundalias = "ru_whisp_followme";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_3_FOLLOW_ME";
+				break;
+			case "4":
+				soundalias = "ru_whisp_getdown";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_4_GET_DOWN";
+				break;
+			case "5":
+				soundalias = "ru_whisp_holdposition";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_5_HOLD_THIS_POSITION";
+				break;
+			case "6":
+				soundalias = "ru_whisp_onpoint";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_6_YOURE_ON_POINT";
+				break;
+			case "7":
+				soundalias = "ru_whisp_hearsomething";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_7_DID_YOU_HEAR_SOMETHING";
+				break;
+			case "8":
+				soundalias = "ru_whisp_whatwasthat";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_8_WHAT_WAS_THAT";
+				break;
+
+			default:
+				return;
+			}
+			break;
+		}
+	}
+	else if(self.pers["team"] == "axis")
+	{
+		switch(game["axis"])
+		{
+		case "german":
+			switch(response)		
+			{
+			case "1":
+				soundalias = "ge_whisp_hey";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_1_HEY";
+				break;
+			case "2":
+				soundalias = "ge_whisp_shh";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_2_SHHH";
+				break;
+			case "3":
+				soundalias = "ge_whisp_followme";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_3_FOLLOW_ME";
+				break;
+			case "4":
+				soundalias = "ge_whisp_getdown";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_4_GET_DOWN";
+				break;
+			case "5":
+				soundalias = "ge_whisp_holdposition";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_5_HOLD_THIS_POSITION";
+				break;
+			case "6":
+				soundalias = "ge_whisp_onpoint";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_6_YOURE_ON_POINT";
+				break;
+			case "7":
+				soundalias = "ge_whisp_hearsomething";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_7_DID_YOU_HEAR_SOMETHING";
+				break;
+			case "8":
+				soundalias = "ge_whisp_whatwasthat";
+				saytext = &"GMI_QUICKMESSAGE_WHISP_8_WHAT_WAS_THAT";
+				break;
+
+			default:
+				return;
+			}
+			break;
+		}			
+	}
+
+	self.spamdelay = true;
+	
+	self saveHeadIcon();
+	self doQuickMessage(soundalias, saytext);
+
+	wait 2;
+	self.spamdelay = undefined;
+
+	self restoreHeadIcon();	
+}
 quickvehicles(response)
 {
 	if(!isdefined(self.pers["team"]) || self.pers["team"] == "spectator" || isdefined(self.spamdelay))
@@ -3690,6 +3972,7 @@ quickrequests(response)
 
 doQuickMessage(soundalias, saytext)
 {
+	return (self maps\mp\gametypes\_anarchic::doQuickMessage(soundalias, saytext));
 	if(self.sessionstate != "playing")
 		return;
 
@@ -3737,7 +4020,8 @@ vsay_monitor()
 	for(;;)
 	{
 		self waittill("vsay", response);
-		
+		if (getcvarint("anarchic_debug") == 1)
+			self iprintln(response);
 		self.vsay = response;
 		self thread vsay_talk();
 		
@@ -3798,6 +4082,20 @@ vsay_talk()
 				break;
 			case "5":
 				self thread quickvehicles(say);
+				break;
+			case "6":
+				self thread quickwhispers(say);
+				break;
+			case "squad.list":
+			case "squad.create":
+			case "squad.join":
+			case "squad.name":
+			case "squad.kick":
+			case "squad.leave":
+			case "squad.members":
+			case "squad.attack":
+				self iprintln("breaking to squad scripts");
+				thread maps\mp\gametypes\_squads::squad(menu, say);
 				break;
 		}
 	}
@@ -3971,7 +4269,11 @@ getWeaponName(weapon)
 	case "sten_mp":
 		weaponname = &"WEAPON_STEN";
 		break;
-		
+
+	case "sten_silenced_mp":
+		weaponname = &"GMI_WEAPON_SILENCED_STEN";
+		break;		
+
 	case "bren_mp":
 		weaponname = &"WEAPON_BREN";
 		break;
@@ -4021,7 +4323,9 @@ getWeaponName(weapon)
 	case "kar98k_sniper_mp":
 		weaponname = &"WEAPON_SCOPEDKAR98K";
 		break;
-				
+	case "fg42_ns_mp":
+		weaponname = &"GMI_WEAPON_FG42_NOSCOPE";	
+		break;
 	default:
 		weaponname = &"WEAPON_UNKNOWNWEAPON";
 		break;
@@ -4224,6 +4528,7 @@ ChangeTeam(team)
 {
 	if (self.sessionstate != "dead")
 	{
+		self notify("player_died"); // anarchicmod
 		// Set a flag on the player to they aren't robbed points for dying - the callback will remove the flag
 		self.autobalance = true;
 		// Suicide the player so they can't hit escape and fail the team balance
@@ -4235,7 +4540,10 @@ ChangeTeam(team)
 	
 	// took this out here so we can determine later on if the teams were changed
 	// and spawn the player in correctly
-//	self.sessionteam = self.pers["team"];
+
+	// anarchic: added it back in because it shows it this way in cod2
+
+	self.sessionteam = self.pers["team"];
 
 	self.freerespawn = true; //for HQ Gametype
 	if (!isdefined (game["timepassed"]))
@@ -4388,14 +4696,20 @@ isweaponavailable(team)
 				return true;
 			if(level.allow_mg30cal == "1")
 				return true;
+			if(level.allow_enfield == "1")
+				return true;
 	
 			return false;
 			break;
 
 		case "british":
+			if(level.allow_m1carbine == "1")
+				return true;
 			if(level.allow_enfield  == "1")
 				return true;
 			if(level.allow_sten == "1")
+				return true;
+			if(level.allow_sten_silenced == "1")
 				return true;
 			if(level.allow_bren == "1")
 				return true;
@@ -4431,6 +4745,8 @@ isweaponavailable(team)
 			if(level.allow_kar98k  == "1")
 				return true;
 			if(level.allow_gewehr43 == "1")
+				return true;
+			if(level.allow_fg42_ns == "1")
 				return true;
 			if(level.allow_mp40 == "1")
 				return true;

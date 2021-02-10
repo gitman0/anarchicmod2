@@ -1,3 +1,11 @@
+/* changed:
+	InitializeBattleRank()
+	GetRankHeadIcon()
+	giveBinoculars()
+	dispense_artillery_strike()
+	GetGunAmmo()
+*/
+
 // ----------------------------------------------------------------------------------
 //	InitializeBattleRank
 //
@@ -87,7 +95,9 @@ InitializeBattleRank()
 	game["br_ammo_satchel_charge_2"] = 0;
 	game["br_ammo_satchel_charge_3"] = 1;
 	game["br_ammo_satchel_charge_4"] = 1;
-	
+
+	maps\mp\gametypes\_anarchic::ranks();	
+
 	if( GetCvar("scr_artillery_first_interval") == "" )
 		setCvar("scr_artillery_first_interval", "45"); 
 	if( GetCvar("scr_artillery_interval") == "" )
@@ -162,12 +172,14 @@ ResetPlayerRank()
 // ----------------------------------------------------------------------------------
 PrecacheBattleRank()
 {
-	
-	precacheHeadIcon(game["br_headicons_allies_0"]);
-	precacheHeadIcon(game["br_headicons_allies_1"]);
-	precacheHeadIcon(game["br_headicons_allies_2"]);
-	precacheHeadIcon(game["br_headicons_allies_3"]);
-	precacheHeadIcon(game["br_headicons_allies_4"]);
+	if (!isdefined(level.cod_headicons) || level.cod_headicons == 0)
+	{
+		precacheHeadIcon(game["br_headicons_allies_0"]);
+		precacheHeadIcon(game["br_headicons_allies_1"]);
+		precacheHeadIcon(game["br_headicons_allies_2"]);
+		precacheHeadIcon(game["br_headicons_allies_3"]);
+		precacheHeadIcon(game["br_headicons_allies_4"]);
+	}
 
 //	precacheHeadIcon(game["br_headicons_axis_0"]);
 //	precacheHeadIcon(game["br_headicons_axis_1"]);
@@ -358,9 +370,18 @@ GetRankHeadIcon(player)
 {	
 	if ( player.pers["team"] == "spectator" )
 		return "";
+	
+	if (level.cod_headicons == 1) {
+		if (player.pers["team"] == "allies")
+			return game["headicon_allies"];
+		else return game["headicon_axis"];
+	}
 
-	icon_name = "br_headicons_allies_" + player.pers["rank"];
-	return game[icon_name];
+	else {
+		icon_name = "br_headicons_allies_" + player.pers["rank"];
+		return game[icon_name];
+	}
+
 }
 
 // ----------------------------------------------------------------------------------
@@ -391,8 +412,6 @@ GetGunAmmo(weapon)
 	
 	switch(weapon)
 	{
-		// projectile weapons need to have default ammo returned for the original
-		// game types
 		case "panzerfaust_mp":
 			return 1;
 		case "panzerschreck_mp":
@@ -402,56 +421,42 @@ GetGunAmmo(weapon)
 		case "flamethrower_mp":
 			return 300;
 			
-		//special weapons	
 		case "fg42_mp":
 		case "fg42_semi_mp":
-			
-		//American Weapons
+		case "fg42_ns_mp":
+		case "fg42_ns_semi_mp":
 		case "thompson_mp": 
 		case "thompson_semi_mp": 
 		case "bar_mp": 
 		case "bar_slow_mp":
 		case "mg30cal_mp":
-		//British Weapons
 		case "sten_mp":
 		case "sten_silenced_mp":
 		case "bren_mp":
-		//Russian Weapons
 		case "ppsh_mp":
 		case "ppsh_semi_mp":
-		//German Weapons
 		case "mp40_mp":
 		case "mp44_semi_mp":
 		case "mp44_mp":
 		case "mg34_mp":
+			return clip_count * clip_size;
 		
-		return clip_count * clip_size;
-		
-		// Semi-automatic rifles get 1 extra clip
-		//American Weapons
 		case "m1carbine_mp":
-		case "m1garand_mp":
-		//Russian Weapons
 		case "svt40_mp":
 		case "dp28_mp":
-		//German Weapons
+			return (clip_count + 1) * clip_size;
+
+		case "m1garand_mp":
+			return (clip_count + 4) * clip_size;
+
 		case "gewehr43_mp":
-
-		return (clip_count + 1) * clip_size;
-
-		// Bolt action rifles get 2 extra clips
-		//American Weapons
 		case "springfield_mp": 
-		//British Weapons
 		case "enfield_mp":
-		//Russian Weapons
 		case "mosin_nagant_mp":
 		case "mosin_nagant_sniper_mp":
-		//German Weapons
 		case "kar98k_mp": 
 		case "kar98k_sniper_mp":
-			
-		return (clip_count + 2) * clip_size;
+			return (clip_count + 2) * clip_size;
 
 		default:
 		   	return 0;
@@ -512,6 +517,9 @@ getWeaponBasedGrenadeCount(weapon)
 
 giveBinoculars(spawnweapon)
 {
+	// anarchic override
+	return (maps\mp\gametypes\_anarchic::giveBinoculars(spawnweapon));
+
 	binoctype = "binoculars_mp";
 	
 	self takeWeapon("binoculars_mp");
@@ -657,6 +665,9 @@ artillery_strike_sounds()
 // ----------------------------------------------------------------------------------
 dispense_artillery_strike()
 {
+	// overridden
+	return (maps\mp\gametypes\_anarchic::dispense_artillery_strike());
+
 	first_interval = GetCvarInt("scr_artillery_first_interval");   
 	interval = GetCvarInt("scr_artillery_interval");
 	interval_range = GetCvarInt("scr_artillery_interval_range");

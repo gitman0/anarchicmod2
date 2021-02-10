@@ -183,6 +183,8 @@ main() // Starts when map is loaded.
 
 	if(getCvar("scr_bas_startrounddelay") == "")	// Time to wait at the begining of the round
 		setCvar("scr_bas_startrounddelay", "15");
+	if(getCvar("scr_bas_midrounddelay") == "")	// Time to wait at the begining of the round
+		setCvar("scr_bas_midrounddelay", "10");
 	if(getCvar("scr_bas_endrounddelay") == "")		// Time to wait at the end of the round
 		setCvar("scr_bas_endrounddelay", "10");
 
@@ -204,6 +206,7 @@ main() // Starts when map is loaded.
 		game["state"] = "playing";
 	if(!isDefined(game["roundsplayed"]))
 		game["roundsplayed"] = 0;
+		setcvar ("g_roundsplayed", game["roundsplayed"]);
 	if(!isDefined(game["matchstarted"]))
 		game["matchstarted"] = false;
 	if(!isDefined(game["matchstarting"]))
@@ -355,6 +358,8 @@ main() // Starts when map is loaded.
 
 	level.basehealth = getCvarInt("scr_bas_basehealth");
 	level.basedamagedhealth = getCvarInt("scr_bas_damagedhealth");
+
+	thread maps\mp\gametypes\_anarchic::main();
 }
 
 precacheAlliesGfx()
@@ -474,6 +479,7 @@ Callback_StartGameType() // Setup the game.
 		game["menu_quickresponses"] = "quickresponses";
 		game["menu_quickvehicles"] = "quickvehicles";
 		game["menu_quickrequests"] = "quickrequests";
+		game["menu_quickwhispers"] = "quickwhispers";
 
 		precacheString(&"MPSCRIPT_PRESS_ACTIVATE_TO_SKIP");
 		precacheString(&"MPSCRIPT_KILLCAM");
@@ -524,6 +530,7 @@ Callback_StartGameType() // Setup the game.
 		precacheMenu(game["menu_quickresponses"]);
 		precacheMenu(game["menu_quickvehicles"]);
 		precacheMenu(game["menu_quickrequests"]);
+		precacheMenu(game["menu_quickwhispers"]);
 
 		precacheShader("gfx/hud/hud@health_bar.dds");
 		precacheShader("black");
@@ -542,9 +549,9 @@ Callback_StartGameType() // Setup the game.
 
 		precacheHeadIcon(game["headicon_allies"]);
 		precacheHeadIcon(game["headicon_axis"]);
-		precacheHeadIcon(game["headicon_carrier"]);
+		//precacheHeadIcon(game["headicon_carrier"]);
 
-		precacheStatusIcon(game["headicon_carrier"]);
+		//precacheStatusIcon(game["headicon_carrier"]);
 
 		// set up team specific variables
 		switch( game["allies"])
@@ -753,6 +760,8 @@ Callback_StartGameType() // Setup the game.
 	thread maps\mp\gametypes\_teams::updateGlobalCvars();
 	thread maps\mp\gametypes\_teams::updateWeaponCvars();
 
+	thread maps\mp\gametypes\_anarchic::Callback_StartGameType();
+
 	game["gamestarted"] = true; // Set the global flag of "gamestarted" to be true.
 	
 	setClientNameMode("auto_change");
@@ -854,8 +863,11 @@ Callback_StartGameType() // Setup the game.
 	thread GameRoundThink();
 	thread startGame();
 	thread updateGametypeCvars();
+	thread addBotClients(); // For development testing
 
 	thread BaseAssault_GMI();
+
+
 }
 
 // ----------------------------------------------------------------------------------
@@ -875,12 +887,15 @@ Callback_PlayerConnect()
 	self.planting = 0;
 	self.defusing = 0;
 	self.lastattacktime = 0;
-	
-	if(!isDefined(self.pers["score"]))
-		self.pers["score"] = 0;
+	self.waiting_to_spawn = false;
 
 	if(!isDefined(self.pers["team"]))
 		iprintln(&"MPSCRIPT_CONNECTED", self);
+
+	self thread maps\mp\gametypes\_anarchic::Callback_PlayerConnect();
+
+	if(!isDefined(self.pers["score"]))
+		self.pers["score"] = 0;
 
 	lpselfnum = self getEntityNumber();
 	lpselfguid = self getGuid();
@@ -949,10 +964,16 @@ Callback_PlayerConnect()
 	// start the vsay thread
 	self thread maps\mp\gametypes\_teams::vsay_monitor();
 
+	self thread menuresponse_loop();
+
+}
+menuresponse_loop()
+{
+	self endon("menuresponse_loop_end");
 	for(;;)
 	{
 		self waittill("menuresponse", menu, response);
-		
+
 		if(menu == game["menu_serverinfo"] && response == "close")
 		{
 			self.pers["skipserverinfo"] = true;
@@ -962,14 +983,17 @@ Callback_PlayerConnect()
 		if(response == "open" || response == "close")
 			continue;
 			
-		if(menu == game["menu_team"] ) // && self.teamkiller != 1)	//JS check to make sure they're not trying to switch teams while in TK limbo
-
+		if(menu == game["menu_team"]) // && self.teamkiller != 1)	//JS check to make sure they're not trying to switch teams while in TK limbo
 		{
 			switch(response)
 			{
 			case "allies":
 			case "axis":
 			case "autoassign":
+				skipbalancecheck = self maps\mp\gametypes\_anarchic::skipbalancecheck(response);
+				if (!skipbalancecheck) response = "autoassign";
+				self thread maps\mp\gametypes\_anarchic::warn_autoassign(skipbalancecheck);
+
 				if(response == "autoassign")
 				{
 					numonteam["allies"] = 0;
@@ -1010,7 +1034,7 @@ Callback_PlayerConnect()
 				if(response == self.pers["team"] && self.sessionstate == "playing")
 					break;
 				
-				
+
 				//Check if the teams will become unbalanced when the player goes to this team...
 				//------------------------------------------------------------------------------
 				if ( (level.teambalance > 0) && (!isdefined (skipbalancecheck)) )
@@ -1151,11 +1175,16 @@ Callback_PlayerConnect()
 				break;
 			}
 		}		
-		else if(menu == game["menu_weapon_allies"] || menu == game["menu_weapon_axis"])
+		else if ( (menu == game["menu_weapon_allies"] || menu == game["menu_weapon_axis"]) && !self.choosing_secondary) //anarchic
 		{
 			if(response == "team")
 			{
-				self openMenu(game["menu_team"]);
+				if (!self.waiting_to_spawn)
+					self openMenu(game["menu_team"]);
+				else {
+					self closeMenu();
+					clientAnnouncement(self, "Please wait to spawn before switching teams");
+				}
 				continue;
 			}
 			else if(response == "viewmap")
@@ -1179,7 +1208,7 @@ Callback_PlayerConnect()
 				self openMenu(menu);
 				continue;
 			}
-			
+
 			self.pers["selectedweapon"] = weapon;
 
 			if(isDefined(self.pers["weapon"]) && self.pers["weapon"] == weapon && !isDefined(self.pers["weapon1"]))
@@ -1237,9 +1266,11 @@ Callback_PlayerConnect()
 			maps\mp\gametypes\_teams::quickvehicles(response);
 		else if(menu == game["menu_quickrequests"])
 			maps\mp\gametypes\_teams::quickrequests(response);
+		else if(menu == game["menu_quickwhispers"])
+			maps\mp\gametypes\_teams::quickwhispers(response);
 	}
+	self iprintln("^2exiting for loop for some strange reason!");
 }
-
 // ----------------------------------------------------------------------------------
 //	Callback_PlayerDisconnect
 //
@@ -1251,6 +1282,9 @@ Callback_PlayerDisconnect()
 	
 	lpselfnum = self getEntityNumber();
 	lpselfguid = self getGuid();
+
+	maps\mp\gametypes\_anarchic::rememberinfo(self);
+
 	logPrint("Q;" + lpselfguid + ";" + lpselfnum + ";" + self.name + "\n");
 
 	self notify("death");
@@ -1268,6 +1302,15 @@ Callback_PlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sW
 {
 	if(self.sessionteam == "spectator")
 		return;
+	/*if (isPlayer(eAttacker)) {
+		if ( isdefined(eAttacker.pers["team"]) && (eAttacker.pers["team"] == "spectator") )
+			return;
+	}*/
+
+	if (maps\mp\gametypes\_anarchic::foy_spawnkill_check(eInflictor, eAttacker, sWeapon))
+		return;
+
+	self thread maps\mp\gametypes\_anarchic::Callback_PlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc);
 
 	// Don't do knockback if the damage direction was not specified
 	if(!isDefined(vDir))
@@ -1330,6 +1373,7 @@ Callback_PlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sW
 		else
 		{
 			// Make sure at least one point of damage is done
+			iDamage = self maps\mp\gametypes\_anarchic::getdamage(iDamage, sMeansOfDeath, eAttacker, sWeapon);
 			if(iDamage < 1)
 				iDamage = 1;
 
@@ -1391,6 +1435,16 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 
 	if(self.sessionteam == "spectator")
 		return;
+
+	/*if (isPlayer(attacker)) {
+		if ( isdefined(attacker.pers["team"]) && (attacker.pers["team"] == "spectator") )
+			return;
+	}*/
+
+	if (maps\mp\gametypes\_anarchic::foy_spawnkill_check(eInflictor, attacker, sWeapon))
+		return;
+
+	self thread maps\mp\gametypes\_anarchic::Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc);
 
 	// reset the progress bar stuff
 	self.progresstime = 0;
@@ -1541,7 +1595,9 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 	if (!isdefined (self.autobalance))
 	{
 		body = self cloneplayer();
-		
+
+		body thread maps\mp\gametypes\_anarchic::searchBodyThread(self);		
+
 		// Make the player drop health
 		self dropHealth();
 	}
@@ -1574,11 +1630,13 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 	self thread respawn();	
 }
 
+
 // ----------------------------------------------------------------------------------
-//	menu_spawn
+//	menu_spawn  
 //
-// 		called from the player connect to spawn the player
+//	called from the player connect to spawn the player
 // ----------------------------------------------------------------------------------
+
 menu_spawn(weapon)
 {
 	if(!game["matchstarted"])
@@ -1613,7 +1671,7 @@ menu_spawn(weapon)
 		}
 	}
 	//JS If the player is alive and playing during a round, don't give the new weapon for now.  We'll give it to the player next time he spawns.
-	else if((self.sessionteam == self.pers["team"] || self.pers["team"] == "spectator" ) && game["matchstarted"] == true && level.roundstarted == true && self.health > 0)
+	else if((self.sessionteam == self.pers["team"] || self.pers["team"] == "spectator" ) && game["matchstarted"] == true && level.roundstarted == true)
 	{
 		if(isDefined(self.pers["weapon"]))
 		{
@@ -1670,6 +1728,7 @@ menu_spawn(weapon)
 	if (isdefined (self.autobalance_notify))
 		self.autobalance_notify destroy();
 }
+
 
 // ----------------------------------------------------------------------------------
 // VICTORY FUNCTION
@@ -1744,7 +1803,7 @@ Respawn()
 
 	self stopwatch_start("respawn", level.respawn_timer[self.pers["team"]] );
 	level thread respawn_pool(self.pers["team"]);
-	
+	self.waiting_to_spawn = true;
 	level waittill("respawn_" + self.pers["team"]);
 	
 	self thread spawnPlayer();
@@ -1778,8 +1837,13 @@ respawn_pool(team)
 // ----------------------------------------------------------------------------------
 SpawnPlayer()
 {
+	self maps\mp\gametypes\_anarchic::prespawn();
+
 	self endon ("end_respawn");
 	self notify("spawned");
+
+	self notify("menuresponse_loop_end");
+	self thread menuresponse_loop();
 
 	self.toldme = 0;
 
@@ -1930,6 +1994,10 @@ SpawnPlayer()
 
 	// setup the hud rank indicator
 	self thread maps\mp\gametypes\_rank_gmi::RankHudInit();
+
+	self.waiting_to_spawn = false;
+
+	self maps\mp\gametypes\_anarchic::spawnPlayer();
 }
 
 // ----------------------------------------------------------------------------------
@@ -1940,6 +2008,8 @@ SpawnPlayer()
 SpawnSpectator(origin, angles)
 {
 	self notify("spawned");
+
+	maps\mp\gametypes\_anarchic::checkSnipers();
 
 	resettimeout();
 
@@ -2229,7 +2299,7 @@ endRound(roundwinner)
  	if (roundwinner == "abort")
 		game["matchstarted"] = false;
 	level.roundstarted = false;
-	 
+
 	if(roundwinner == "allies")
 	{		
 		players = getentarray("player", "classname");
@@ -2305,7 +2375,7 @@ endRound(roundwinner)
 	if(game["matchstarted"])
 	{
 		game["roundsplayed"]++;
-		
+		setcvar("g_roundsplayed", game["roundsplayed"]);
 		if ( !level.mapended )
 			checkRoundLimit();
 	}
@@ -2357,10 +2427,12 @@ RestartMap( )
 		return;
 		
 	game["matchstarting"] = true;
-	
+	logPrint("-----MATCH STARTING-----\n");	
 	level thread maps\mp\_util_mp_gmi::make_permanent_announcement(&"GMI_DOM_MATCHSTARTING", "cleanup match starting");			
-	
-	time = getCvarInt("scr_bas_startrounddelay");
+
+	if (getCvarInt("g_roundsplayed") == 0)	
+		time = getCvarInt("scr_bas_startrounddelay");
+	else time = getCvarInt("scr_bas_midrounddelay");
 	
 	if ( time < 1 )
 		time = 1;
@@ -2391,6 +2463,7 @@ RestartMap( )
 		return;
 
 	game["matchstarted"] = true;
+	logPrint("-----MATCH STARTED-----\n");
 	game["matchstarting"] = false;
 
 	if ( getCvarint("scr_bas_clearscoreeachround") == 1 && !level.mapended )
@@ -2409,10 +2482,13 @@ RestartMap( )
 // ----------------------------------------------------------------------------------
 endMap()
 {
+
 	game["state"] = "intermission";
 	level notify("intermission");
 	level notify("kill_startround");
-	
+
+	maps\mp\gametypes\_anarchic::endMap();
+
 	if(game["alliedscore"] == game["axisscore"])
 	{
 		endRound("draw");
@@ -2698,7 +2774,7 @@ updateGametypeCvars()
 // ----------------------------------------------------------------------------------
 updateTeamStatus()
 {
-	wait 0;	// Required for Callback_PlayerDisconnect to complete before updateTeamStatus can execute
+	wait 0.0;	// Required for Callback_PlayerDisconnect to complete before updateTeamStatus can execute
 	
 	resettimeout();
 
@@ -3139,7 +3215,7 @@ BaseAssault_bomb_think()
 	self endon ("bomb_exploded");
 	
 	barsize = maps\mp\_util_mp_gmi::get_progressbar_maxwidth();
-	
+	count = 1;
 	level.barincrement = (barsize / (20.0 * level.defusetime));
 
 	for(;;)
@@ -3152,7 +3228,7 @@ BaseAssault_bomb_think()
 			count -= 1;
 			if(count == 0)
 			{
-				who iprintln(&"GMI_DOM_WAIT_TILL_MATCHSTART");
+				other iprintln(&"GMI_DOM_WAIT_TILL_MATCHSTART");
 				count = 100;
 			}
 			wait 0.05;
@@ -3235,7 +3311,9 @@ BaseAssault_bomb_think()
 
 					if (isdefined(other))
 					{
-						other.pers["score"] += getCvarInt("scr_bas_defuse_score");
+						if (other.pers["team"] == self.script_team)
+							other.pers["score"] += getCvarInt("scr_bas_defuse_score");
+						else other.pers["score"] += -2; // should cvar this
 						other.score = other.pers["score"];
 						lpselfnum = other getEntityNumber();
 						lpselfguid = other getGuid();
@@ -3268,6 +3346,7 @@ BaseAssault_bomb_think()
 			}
 			self.defusing = undefined;
 			other thread BaseAssault_check_bomb(self);
+			wait 2;
 		}
 	}
 }
@@ -3282,7 +3361,7 @@ BaseAssault_notify_team(sound,option)
 	for(i = 0; i < players.size; i++)
 	{
 		shouldplay = 0;
-		if (players[i].pers["team"] == option)
+		if ( isdefined(players[i].pers["team"]) && players[i].pers["team"] == option )
 		{
 			shouldplay = 1;
 		}
@@ -3791,10 +3870,11 @@ BaseAssault_ObjectiveZone_think()
 					}
 				}
 				self.planting = false;
-				wait .05;
+				wait 0.05;
 			}
 			if (isalive(other))
 				other thread BaseAssault_check_bombzone(self);
+			wait 2;
 		}
 	}
 }
@@ -3931,7 +4011,10 @@ BaseAssault_base_think()
 
 		if (!isplayer(who))	continue;
 
-		if (isdefined(inflictor.vehicletype) && ((inflictor.vehicletype == "flak88_mp") || (inflictor.vehicletype == "Flak88_MP"))) continue;
+		if (isdefined(inflictor.vehicletype) && ((inflictor.vehicletype == "flak88_mp") || (inflictor.vehicletype == "Flak88_MP"))) {
+			if (level.bas_flak_damage == 0)
+				continue;
+		}
 
 		if(game["matchstarted"] == false || level.roundstarted == false)
 		{
@@ -4250,4 +4333,38 @@ close_to_an_enemy_base(player, radius)
 	}
 	
 	return false;
+}
+addBotClients()
+{
+	wait 5;
+	
+	for(;;)
+	{
+		if(getCvarInt("scr_numbots") > 0)
+			break;
+		wait 1;
+	}
+	
+	iNumBots = getCvarInt("scr_numbots");
+	for(i = 0; i < iNumBots; i++)
+	{
+		ent[i] = addtestclient();
+		wait 0.5;
+
+		if(isPlayer(ent[i]))
+		{
+			if(i & 1)
+			{
+				ent[i] notify("menuresponse", game["menu_team"], "axis");
+				wait 0.5;
+				ent[i] notify("menuresponse", game["menu_weapon_axis"], "kar98k_mp");
+			}
+			else
+			{
+				ent[i] notify("menuresponse", game["menu_team"], "allies");
+				wait 0.5;
+				ent[i] notify("menuresponse", game["menu_weapon_allies"], "springfield_mp");
+			}
+		}
+	}
 }
